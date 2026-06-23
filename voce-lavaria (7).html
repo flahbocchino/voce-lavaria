@@ -1,0 +1,3863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Você Lavaria? — O jogo dos dois lados do crime financeiro</title>
+<meta name="author" content="Flávia Bocchino">
+<meta name="copyright" content="© 2026 Flávia Bocchino. Todos os direitos reservados.">
+<meta name="description" content="Jogo educativo de inteligência financeira: detecte esquemas de lavagem de dinheiro ou monte um e veja por que ele falha. 100 missões baseadas em operações reais brasileiras.">
+<meta property="og:title" content="Você Lavaria?">
+<meta property="og:description" content="O jogo dos dois lados do crime financeiro. 100 missões. Casos reais. Criado por Flávia Bocchino.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0F;
+  --panel: #12121A;
+  --panel2: #1A1A2E;
+  --border: #2A2A3E;
+  --red: #E63946;
+  --red-dim: rgba(230,57,70,0.15);
+  --blue: #00B4D8;
+  --blue-dim: rgba(0,180,216,0.12);
+  --green: #06D6A0;
+  --green-dim: rgba(6,214,160,0.12);
+  --amber: #FFB703;
+  --amber-dim: rgba(255,183,3,0.12);
+  --text: #EEEEF8;
+  --text-dim: #b0b0d0;
+  --text-muted: #8080a8;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --display: 'Space Grotesk', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SCREENS ─── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ─── SCREEN: HOME ─── */
+#screen-home {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0,180,216,0.13) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 30%, rgba(230,57,70,0.11) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(6,214,160,0.07) 0%, transparent 45%);
+}
+
+.nodes-canvas {
+  position: absolute; inset: 0;
+  opacity: 0.75;
+}
+
+/* Overlay escuro no centro para o texto respirar sobre as notas */
+.home-content {
+  position: relative;
+  text-align: center;
+  max-width: 760px;
+  padding: 48px 32px;
+  background: radial-gradient(ellipse at center, rgba(10,10,15,0.72) 30%, transparent 80%);
+  border-radius: 32px;
+}
+
+.home-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.home-eyebrow::before,
+.home-eyebrow::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--blue);
+  opacity: 0.5;
+}
+
+.home-title {
+  font-family: var(--display);
+  font-size: clamp(64px, 12vw, 112px);
+  font-weight: 700;
+  line-height: 0.92;
+  margin-bottom: 6px;
+  background: linear-gradient(160deg, #ffffff 30%, #a8e6ff 70%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 40px rgba(0,180,216,0.25));
+}
+
+.home-question-mark {
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(160deg, var(--red) 0%, #ff6b7a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 24px rgba(230,57,70,0.5));
+}
+
+/* Subtítulo em dois blocos visuais distintos */
+.home-taglines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 44px;
+  margin-top: 28px;
+}
+
+.home-tagline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-size: clamp(15px, 2.5vw, 19px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+}
+
+.home-tagline.inv {
+  color: #e0f4ff;
+}
+
+.home-tagline.con {
+  color: #ffe0e0;
+}
+
+.home-tagline-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.home-tagline-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 4px auto;
+  opacity: 0.6;
+}
+
+.home-btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  padding: 18px 48px;
+  background: linear-gradient(135deg, var(--red) 0%, #c1121f 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 24px rgba(230,57,70,0.30);
+}
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(230,57,70,0.50);
+}
+
+.btn-ghost {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 18px 32px;
+  background: rgba(255,255,255,0.05);
+  color: #c8c8e0;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+.btn-ghost:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: rgba(0,180,216,0.08);
+}
+
+.home-stats {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin-top: 52px;
+  flex-wrap: wrap;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  background: rgba(10,10,20,0.50);
+}
+
+.home-stat {
+  text-align: center;
+  padding: 20px 28px;
+  flex: 1;
+  min-width: 120px;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  transition: background 0.2s;
+}
+.home-stat:last-child { border-right: none; }
+.home-stat:hover { background: rgba(0,180,216,0.06); }
+
+.home-stat-num {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+.home-stat:nth-child(1) .home-stat-num { color: var(--blue); }
+.home-stat:nth-child(2) .home-stat-num { color: var(--green); }
+.home-stat:nth-child(3) .home-stat-num { color: var(--amber); }
+.home-stat:nth-child(4) .home-stat-num { color: var(--red); }
+
+.home-stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: var(--mono);
+}
+
+/* ─── SCREEN: COMO FUNCIONA ─── */
+#screen-how {
+  padding: 40px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.back-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--blue); }
+
+.how-title {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 32px;
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 600px) { .how-grid { grid-template-columns: 1fr; } }
+
+.how-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.how-card-icon { font-size: 28px; margin-bottom: 12px; }
+.how-card-title { font-family: var(--display); font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.how-card-text { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+.how-steps { margin-top: 32px; }
+.how-step { display: flex; gap: 20px; margin-bottom: 24px; }
+.how-step-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border-radius: 6px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  height: fit-content;
+}
+.how-step-content h4 { font-family: var(--display); font-size: 16px; margin-bottom: 4px; }
+.how-step-content p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+/* ─── SCREEN: CHOOSE MODE ─── */
+#screen-mode {
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.mode-title {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.mode-subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.mode-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 720px;
+  width: 100%;
+}
+
+@media (max-width: 600px) { .mode-cards { grid-template-columns: 1fr; } }
+
+.mode-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+}
+
+.mode-card:hover { transform: translateY(-4px); }
+.mode-card.investigador:hover { border-color: var(--blue); box-shadow: 0 12px 40px rgba(0,180,216,0.15); }
+.mode-card.construtor:hover { border-color: var(--red); box-shadow: 0 12px 40px rgba(230,57,70,0.15); }
+
+.mode-icon { font-size: 48px; margin-bottom: 16px; }
+.mode-name { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.mode-card.investigador .mode-name { color: var(--blue); }
+.mode-card.construtor .mode-name { color: var(--red); }
+.mode-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+.mode-tag {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.investigador .mode-tag { background: var(--blue-dim); color: var(--blue); }
+.construtor .mode-tag { background: var(--red-dim); color: var(--red); }
+
+/* ─── SCREEN: DIFFICULTY ─── */
+#screen-difficulty {
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.diff-header { text-align: center; margin-bottom: 48px; }
+.diff-mode-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.badge-inv { background: var(--blue-dim); color: var(--blue); }
+.badge-con { background: var(--red-dim); color: var(--red); }
+
+.diff-title { font-family: var(--display); font-size: 28px; font-weight: 700; }
+
+.diff-cards { display: flex; flex-direction: column; gap: 16px; max-width: 560px; width: 100%; }
+
+.diff-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.diff-card:hover { transform: translateX(6px); }
+.diff-card.easy:hover { border-color: var(--green); }
+.diff-card.medium:hover { border-color: var(--amber); }
+.diff-card.hard:hover { border-color: var(--red); }
+
+.diff-icon { font-size: 28px; flex-shrink: 0; }
+.diff-info h3 { font-family: var(--display); font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.diff-info p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+.diff-dots { margin-left: auto; display: flex; gap: 4px; }
+.diff-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.diff-card.easy .diff-dot:nth-child(1) { background: var(--green); }
+.diff-card.medium .diff-dot:nth-child(-n+2) { background: var(--amber); }
+.diff-card.hard .diff-dot { background: var(--red); }
+
+/* ─── SCREEN: BRIEFING ─── */
+#screen-briefing {
+  padding: 0;
+  flex-direction: column;
+}
+
+.briefing-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+.briefing-meta { display: flex; align-items: center; gap: 16px; }
+.briefing-mission-id {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.briefing-mission-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.briefing-skip-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.briefing-skip-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+.briefing-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .briefing-body { grid-template-columns: 1fr; }
+  .briefing-glossary { display: none; }
+}
+
+.briefing-main {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.briefing-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.briefing-concept-title {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.briefing-text {
+  font-size: 15px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.briefing-interactive {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.briefing-interactive-title {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 16px;
+}
+
+/* Flow ordering exercise */
+.flow-steps { display: flex; flex-direction: column; gap: 10px; }
+.flow-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: grab;
+  transition: all 0.2s;
+  user-select: none;
+}
+.flow-step-item:hover { border-color: var(--blue); }
+.flow-step-item.dragging { opacity: 0.4; }
+.flow-step-item.correct { border-color: var(--green); background: var(--green-dim); }
+.flow-step-item.incorrect { border-color: var(--red); background: var(--red-dim); }
+.flow-step-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: center;
+}
+.flow-step-text { font-size: 14px; }
+
+/* Click-to-identify exercise */
+.identify-items { display: flex; flex-direction: column; gap: 8px; }
+.identify-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.identify-item:hover { border-color: var(--blue); }
+.identify-item.flagged { border-color: var(--red); background: var(--red-dim); }
+.identify-item.confirmed-flag { border-color: var(--green); background: var(--green-dim); }
+.identify-item.confirmed-ok { border-color: var(--border); opacity: 0.5; }
+.identify-icon { font-size: 16px; margin-top: 1px; }
+.identify-text { font-size: 14px; line-height: 1.5; }
+.identify-explain { font-size: 12px; color: var(--text-dim); margin-top: 4px; display: none; }
+.identify-item.confirmed-flag .identify-explain,
+.identify-item.confirmed-ok .identify-explain { display: block; }
+
+/* Hypothesis choice */
+.hypothesis-options { display: flex; flex-direction: column; gap: 10px; }
+.hypothesis-option {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.2s;
+}
+.hypothesis-option:hover { border-color: var(--blue); }
+.hypothesis-option.correct { border-color: var(--green); background: var(--green-dim); }
+.hypothesis-option.incorrect { border-color: var(--red); background: var(--red-dim); }
+.hypothesis-option.disabled { pointer-events: none; opacity: 0.5; }
+
+.briefing-feedback {
+  display: none;
+  background: var(--panel2);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-top: 16px;
+}
+.briefing-feedback.visible { display: block; }
+.briefing-feedback.error { border-color: var(--red); }
+
+.briefing-continue-btn {
+  display: none;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 32px;
+  background: var(--blue);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: all 0.2s;
+}
+.briefing-continue-btn.visible { display: inline-block; }
+.briefing-continue-btn:hover { background: #00d4ff; transform: translateY(-1px); }
+
+/* Glossary sidebar */
+.briefing-glossary {
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 32px 24px;
+  background: var(--panel);
+}
+
+.glossary-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #9090b8;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.glossary-item {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.glossary-item:last-child { border-bottom: none; }
+
+.glossary-term {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glossary-acronym {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #9090b8;
+  font-weight: 400;
+}
+
+.glossary-def {
+  font-size: 13px;
+  color: #c8c8e8;
+  line-height: 1.6;
+}
+
+/* ─── SCREEN: GAME ─── */
+#screen-game {
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.game-mode-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.game-mission-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.game-mission-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.game-mission-title {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-score-area {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.game-score {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.game-timer {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-dim);
+  background: var(--panel2);
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.game-timer.warning { color: var(--red); border-color: var(--red); animation: pulse 1s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Exposure meter (construtor only) */
+.exposure-bar-wrapper {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.exposure-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.exposure-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.exposure-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease, background 0.6s ease;
+  background: var(--blue);
+}
+
+/* Game body */
+.game-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .game-body { grid-template-columns: 1fr; }
+  .game-sidebar { display: none; }
+}
+
+.game-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-panels {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.game-panel {
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+.game-panel:last-child { border-right: none; }
+
+.game-panel-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* Alert items */
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.alert-item:hover { border-color: var(--amber); }
+.alert-item.selected { border-color: var(--red); background: var(--red-dim); }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 5px; }
+.alert-text { font-size: 13px; line-height: 1.5; color: var(--text-dim); }
+.alert-value { font-family: var(--mono); color: var(--text); }
+
+/* Client data */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table tr { border-bottom: 1px solid var(--border); }
+.data-table td { padding: 10px 0; font-size: 13px; }
+.data-table td:first-child { color: var(--text-muted); width: 45%; font-family: var(--mono); font-size: 12px; }
+.data-table td:last-child { color: var(--text); font-weight: 500; }
+.data-table .flag-value { color: var(--red); }
+.data-table .ok-value { color: var(--green); }
+
+/* Decision panel */
+.game-decisions {
+  border-top: 1px solid var(--border);
+  padding: 20px 24px;
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+.decisions-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.decisions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.decision-btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 16px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.decision-btn:hover { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); }
+.decision-btn.danger:hover { border-color: var(--red); background: var(--red-dim); color: var(--red); }
+.decision-btn.confirm:hover { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.decision-btn .decision-icon { font-size: 16px; }
+
+/* Construtor choices */
+.choice-group { margin-bottom: 24px; }
+.choice-group-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--text-dim); }
+
+.choice-options { display: flex; flex-direction: column; gap: 8px; }
+.choice-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.choice-option:hover { border-color: var(--red); }
+.choice-option.selected { border-color: var(--red); background: var(--red-dim); }
+
+.choice-radio {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.2s;
+}
+.choice-option.selected .choice-radio { border-color: var(--red); background: var(--red); }
+
+.choice-text { font-size: 13px; line-height: 1.5; }
+.choice-risk {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.choice-risk.high { color: var(--red); }
+.choice-risk.medium { color: var(--amber); }
+.choice-risk.low { color: var(--green); }
+
+/* Sidebar */
+.game-sidebar {
+  border-left: 1px solid var(--border);
+  background: var(--panel);
+  overflow-y: auto;
+  padding: 24px 20px;
+}
+
+.sidebar-section { margin-bottom: 28px; }
+
+.sidebar-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #9090b8;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-glossary-item {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 0 -8px 8px;
+}
+.sidebar-glossary-item:hover { background: rgba(0,180,216,0.07); }
+
+.sidebar-term {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sidebar-term-full {
+  font-size: 11px;
+  color: #9090b8;
+  font-weight: 400;
+  font-family: var(--mono);
+}
+
+.sidebar-def {
+  font-size: 13px;
+  color: #c8c8e8;
+  line-height: 1.6;
+  margin-top: 6px;
+  display: none;
+}
+.sidebar-def.expanded { display: block; }
+
+.hint-btn {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 16px;
+  background: var(--amber-dim);
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  color: var(--amber);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.hint-btn:hover { background: rgba(255,183,3,0.2); }
+.hint-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.hint-text {
+  display: none;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--amber-dim);
+  border-radius: 8px;
+}
+.hint-text.visible { display: block; }
+
+/* ─── SCREEN: DEBRIEF ─── */
+#screen-debrief {
+  padding: 40px 24px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.debrief-result {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+
+.debrief-result-icon { font-size: 56px; }
+.debrief-result-info h2 {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.debrief-result-info p { font-size: 15px; color: var(--text-dim); }
+
+.debrief-score-pills {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.score-pill {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+.score-pill.good { background: var(--green-dim); color: var(--green); }
+.score-pill.bad { background: var(--red-dim); color: var(--red); }
+.score-pill.neutral { background: var(--blue-dim); color: var(--blue); }
+
+/* Flow map */
+.debrief-section { margin-bottom: 32px; }
+.debrief-section-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.flow-map {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.flow-row:last-child { margin-bottom: 0; }
+
+/* Nós do fluxo com animação de entrada */
+.flow-node {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: nodeIn 0.4s ease forwards;
+}
+@keyframes nodeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+.flow-node.origin    { border-color: var(--red);   color: var(--red);   background: var(--red-dim); }
+.flow-node.middle    { border-color: var(--amber);  color: var(--amber); background: var(--amber-dim); }
+.flow-node.destination { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.flow-node.detection { border-color: var(--blue);  color: var(--blue);  background: var(--blue-dim); }
+
+.flow-arrow {
+  color: var(--text-muted);
+  font-size: 20px;
+  opacity: 0;
+  animation: nodeIn 0.4s ease 0.2s forwards;
+}
+
+/* animation-delay controlado inline pelo JS para precisão por índice de row */
+
+/* ─── STREAK COUNTER ─── */
+.streak-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.streak-badge {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #FFB703, #FF8C00);
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: streakPop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes streakPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.streak-label { font-size: 13px; color: var(--text-dim); }
+
+/* ─── BADGE OPERAÇÃO REAL ─── */
+.op-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(6,214,160,0.12);
+  border: 1px solid rgba(6,214,160,0.3);
+  color: var(--green);
+  margin-top: 10px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.op-badge:hover { background: rgba(6,214,160,0.22); }
+.op-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+/* Badge nos cards de missão */
+.mission-op-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mission-op-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+/* ─── MISSION CARDS MELHORADOS ─── */
+
+.flow-arrow {
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+/* Red flags found */
+.flags-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 600px) { .flags-grid { grid-template-columns: 1fr; } }
+
+.flag-item {
+  display: flex;
+  gap: 12px;
+  background: var(--panel2);
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+}
+.flag-item.found { border-color: var(--green); }
+.flag-item.missed { border-color: var(--border); opacity: 0.6; }
+.flag-status { font-size: 16px; flex-shrink: 0; }
+.flag-text { font-size: 13px; line-height: 1.5; }
+.flag-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+
+/* Legal references */
+.refs-grid { display: flex; flex-direction: column; gap: 12px; }
+
+.ref-item {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.ref-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.ref-icon { font-size: 20px; flex-shrink: 0; }
+.ref-name { font-family: var(--mono); font-size: 13px; color: var(--blue); margin-bottom: 2px; }
+.ref-full { font-size: 12px; color: var(--text-muted); }
+.ref-plain {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  background: var(--panel);
+  border-left: 3px solid var(--blue);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+}
+
+/* Decision correct/wrong */
+.debrief-decision {
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+.debrief-decision.correct { border-color: var(--green); }
+.debrief-decision.wrong { border-color: var(--red); }
+
+.debrief-decision-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.correct .debrief-decision-label { color: var(--green); }
+.wrong .debrief-decision-label { color: var(--red); }
+
+.debrief-decision-text { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+.debrief-btns {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+/* ─── MISSION SELECT ─── */
+#screen-missions {
+  padding: 32px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.missions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.missions-title { font-family: var(--display); font-size: 26px; font-weight: 700; }
+
+.missions-filters { display: flex; gap: 8px; }
+.filter-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+
+.missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.mission-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 18px 18px 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+/* Borda lateral colorida grossa */
+.mission-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 10px 0 0 10px;
+  background: var(--border);
+  transition: background 0.2s;
+}
+.mission-card.easy::before   { background: var(--green); }
+.mission-card.medium::before { background: var(--amber); }
+.mission-card.hard::before   { background: var(--red); }
+
+.mission-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.mission-card.easy:hover   { border-color: var(--green); box-shadow: 0 8px 24px rgba(6,214,160,0.12); }
+.mission-card.medium:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(255,183,3,0.12); }
+.mission-card.hard:hover   { border-color: var(--red);   box-shadow: 0 8px 24px rgba(230,57,70,0.12); }
+.mission-card.locked { opacity: 0.4; cursor: not-allowed; }
+.mission-card.locked:hover { transform: none; border-color: var(--border); box-shadow: none; }
+.mission-card.completed { border-color: rgba(6,214,160,0.4); background: rgba(6,214,160,0.04); }
+
+.mission-card-id {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.mission-card-title {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.mission-card-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.mission-diff-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.diff-easy   { background: rgba(6,214,160,0.15);  color: var(--green); }
+.diff-medium { background: rgba(255,183,3,0.15);  color: var(--amber); }
+.diff-hard   { background: rgba(230,57,70,0.15);  color: var(--red); }
+
+.mission-completed-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-size: 14px;
+}
+
+/* ─── UTILITY ─── */
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+.progress-bar-wrapper { margin-bottom: 8px; }
+.progress-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--blue); border-radius: 2px; transition: width 0.5s ease; }
+
+/* Notification toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 14px;
+  max-width: 320px;
+  z-index: 1000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: var(--green); }
+.toast.error { border-color: var(--red); }
+.toast.info { border-color: var(--blue); }
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,15,0.85);
+  z-index: 900;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.visible { display: flex; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-title { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+.modal-text { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+.modal-btns { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.modal-close { position: absolute; top: 0; right: 0; }
+</style>
+</head>
+<body>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── MODAL ─── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content">
+    <h3 class="modal-title" id="modal-title"></h3>
+    <div class="modal-text" id="modal-text"></div>
+    <div class="modal-btns" id="modal-btns"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 1: HOME
+════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-bg"></div>
+  <canvas class="nodes-canvas" id="nodes-canvas"></canvas>
+
+  <div class="home-content">
+
+    <div class="home-eyebrow">Crime Financeiro · Fintechs · Brasil</div>
+
+    <h1 class="home-title">Você<br>Lavaria<span class="home-question-mark">?</span></h1>
+
+    <div class="home-taglines">
+      <div class="home-tagline inv">
+        <span class="home-tagline-icon">🔍</span>
+        Detecte o esquema antes que o dinheiro desapareça.
+      </div>
+      <div class="home-tagline-divider"></div>
+      <div class="home-tagline con">
+        <span class="home-tagline-icon">🏗️</span>
+        Monte o esquema e descubra por que ele sempre falha.
+      </div>
+    </div>
+
+    <div class="home-btns">
+      <button class="btn-primary" onclick="goTo('screen-mode')">▶ Jogar agora</button>
+      <button class="btn-ghost" onclick="goTo('screen-how')">Como funciona</button>
+      <button class="btn-ghost" onclick="showStats()" style="font-size:14px;padding:18px 24px">📊 Stats</button>
+    </div>
+
+    <div class="home-stats">
+      <div class="home-stat">
+        <span class="home-stat-num">100</span>
+        <div class="home-stat-label">Missões</div>
+      </div>
+      <div class="home-stat">
+        <span class="home-stat-num">2</span>
+        <div class="home-stat-label">Lados do jogo</div>
+      </div>
+      <div class="home-stat">
+        <span class="home-stat-num">R$26bi</span>
+        <div class="home-stat-label">Em casos reais</div>
+      </div>
+      <div class="home-stat">
+        <span class="home-stat-num">25+</span>
+        <div class="home-stat-label">Operações PF</div>
+      </div>
+    </div>
+
+    <!-- Crédito de direitos autorais -->
+    <div style="margin-top:36px;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:0.5px;line-height:1.8">
+      © 2026 Flávia Bocchino · Todos os direitos reservados<br>
+      <span style="font-size:10px;opacity:0.7">Reprodução, distribuição ou uso comercial sem autorização expressa é proibido.</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 2: COMO FUNCIONA
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-how">
+  <button class="back-btn" onclick="goTo('screen-home')">← Voltar</button>
+
+  <h2 class="how-title">Como funciona</h2>
+
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-card-icon">🔍</div>
+      <div class="how-card-title">Modo Investigador</div>
+      <div class="how-card-text">Você é analista de PLD em uma fintech. Recebe alertas, analisa dados de clientes e transações, e decide: escalar, solicitar documentos ou comunicar ao COAF. Cada decisão tem consequências.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-card-icon">🏗️</div>
+      <div class="how-card-title">Modo Construtor</div>
+      <div class="how-card-text">Você monta o esquema, escolhendo canais, laranjas, empresas, criptoativos. Um medidor de exposição sobe a cada decisão. Você aprende por que cada técnica deixa rastro — e por que nenhum esquema é invisível.</div>
+    </div>
+  </div>
+
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-step-num">01</div>
+      <div class="how-step-content">
+        <h4>Escolha seu modo e nível</h4>
+        <p>Investigador ou Construtor. Fácil, Médio ou Difícil. O nível muda o volume de dados, a disponibilidade de dicas e a pressão de tempo.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">02</div>
+      <div class="how-step-content">
+        <h4>Briefing interativo (ou pule)</h4>
+        <p>Antes de cada missão, você pode interagir com conceitos — identificar red flags, ordenar fluxos, escolher hipóteses. Aprenda fazendo, não lendo. Ou pule e vá direto ao jogo.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">03</div>
+      <div class="how-step-content">
+        <h4>Jogue e tome decisões</h4>
+        <p>Analise dados reais, identifique padrões, tome decisões com consequências. O glossário fica sempre visível com todas as siglas explicadas.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">04</div>
+      <div class="how-step-content">
+        <h4>Debriefing com base legal</h4>
+        <p>Cada missão termina com o mapa completo do esquema, o que você acertou e errou, e a base legal real — com explicação em linguagem simples do que cada norma significa.</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" style="margin-top:32px" onclick="goTo('screen-mode')">Começar →</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 3: ESCOLHA DE MODO
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-mode">
+  <div style="padding:20px 24px">
+    <button class="back-btn" onclick="goTo('screen-home')">← Voltar</button>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 40px">
+    <h2 class="mode-title">Escolha seu lado</h2>
+    <p class="mode-subtitle">Dois modos, uma mesma realidade. Perspectivas opostas do mesmo crime.</p>
+
+    <div class="mode-cards">
+      <div class="mode-card investigador" onclick="selectMode('investigador')">
+        <div class="mode-icon">🔍</div>
+        <div class="mode-name">Investigador</div>
+        <p class="mode-desc">Você é analista de Prevenção à Lavagem de Dinheiro. Sua missão: detectar esquemas antes que o dinheiro desapareça.</p>
+        <div class="mode-tag">50 missões</div>
+      </div>
+      <div class="mode-card construtor" onclick="selectMode('construtor')">
+        <div class="mode-icon">🏗️</div>
+        <div class="mode-name">Construtor</div>
+        <p class="mode-desc">Você monta o esquema. Cada decisão aumenta sua exposição. Aprenda por que todo esquema deixa rastro.</p>
+        <div class="mode-tag">50 missões</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 4: DIFICULDADE
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-difficulty">
+  <div style="padding:20px 24px">
+    <button class="back-btn" onclick="goTo('screen-mode')">← Voltar</button>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 40px">
+    <div class="diff-header">
+      <div class="diff-mode-badge" id="diff-mode-badge"></div>
+      <h2 class="diff-title">Escolha o nível</h2>
+    </div>
+
+    <div class="diff-cards">
+      <div class="diff-card easy" onclick="selectDifficulty('easy')">
+        <div class="diff-icon">🟢</div>
+        <div class="diff-info">
+          <h3>Fácil</h3>
+          <p>Casos diretos. Red flags evidentes. Dicas gratuitas. Sem pressão de tempo. Ideal para quem está começando.</p>
+        </div>
+        <div class="diff-dots">
+          <div class="diff-dot"></div><div class="diff-dot"></div><div class="diff-dot"></div>
+        </div>
+      </div>
+      <div class="diff-card medium" onclick="selectDifficulty('medium')">
+        <div class="diff-icon">🟡</div>
+        <div class="diff-info">
+          <h3>Médio</h3>
+          <p>Múltiplos atores. Red flags misturados com dados legítimos. Dicas custam pontos. Tempo sugerido.</p>
+        </div>
+        <div class="diff-dots">
+          <div class="diff-dot"></div><div class="diff-dot"></div><div class="diff-dot"></div>
+        </div>
+      </div>
+      <div class="diff-card hard" onclick="selectDifficulty('hard')">
+        <div class="diff-icon">🔴</div>
+        <div class="diff-info">
+          <h3>Difícil</h3>
+          <p>Multicamadas. Sem dicas. Tempo limitado. Documentos contraditórios. Para quem já conhece o assunto.</p>
+        </div>
+        <div class="diff-dots">
+          <div class="diff-dot"></div><div class="diff-dot"></div><div class="diff-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 5: SELEÇÃO DE MISSÃO
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-missions">
+  <div class="missions-header">
+    <div>
+      <button class="back-btn" onclick="goTo('screen-difficulty')" style="margin-bottom:8px">← Voltar</button>
+      <h2 class="missions-title" id="missions-title">Missões</h2>
+    </div>
+    <div class="missions-filters">
+      <button class="filter-btn active" onclick="filterMissions('all',this)">Todas</button>
+      <button class="filter-btn" onclick="filterMissions('easy',this)">Fácil</button>
+      <button class="filter-btn" onclick="filterMissions('medium',this)">Médio</button>
+      <button class="filter-btn" onclick="filterMissions('hard',this)">Difícil</button>
+    </div>
+  </div>
+  <div class="missions-grid" id="missions-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 6: BRIEFING
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-briefing">
+  <div class="briefing-topbar">
+    <div class="briefing-meta">
+      <div class="briefing-mission-id" id="briefing-mission-id"></div>
+      <div class="briefing-mission-title" id="briefing-mission-title"></div>
+    </div>
+    <button class="briefing-skip-btn" onclick="startGame()">Pular briefing →</button>
+  </div>
+
+  <div class="briefing-body">
+    <div class="briefing-main" id="briefing-main">
+      <!-- Preenchido por JS -->
+    </div>
+
+    <div class="briefing-glossary">
+      <div class="glossary-title">Glossário desta missão</div>
+      <div id="briefing-glossary-items"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 7: JOGO
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-game">
+  <div class="game-topbar">
+    <div class="game-mode-badge" id="game-mode-badge"></div>
+    <div class="game-mission-info">
+      <div class="game-mission-id" id="game-mission-id"></div>
+      <div class="game-mission-title" id="game-mission-title"></div>
+    </div>
+    <div class="game-score-area">
+      <div class="game-score" id="game-score">Pontos: 0</div>
+      <div id="streak-display" style="display:none;font-family:var(--mono);font-size:12px;color:var(--amber)"></div>
+      <div class="game-timer" id="game-timer">--:--</div>
+      <button id="sound-btn" onclick="toggleSound()" title="Som" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:16px;color:var(--text-dim);transition:all 0.2s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">🔊</button>
+
+      <!-- Medidor de exposição (construtor) -->
+      <div class="exposure-bar-wrapper" id="exposure-wrapper" style="display:none">
+        <div class="exposure-label">
+          <span>Exposição</span>
+          <span id="exposure-pct">0%</span>
+        </div>
+        <div class="exposure-bar">
+          <div class="exposure-fill" id="exposure-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-body">
+    <div class="game-main">
+      <div class="game-panels" id="game-panels">
+        <!-- Preenchido por JS -->
+      </div>
+      <div class="game-decisions" id="game-decisions">
+        <div class="decisions-title">Suas decisões</div>
+        <div class="decisions-grid" id="decisions-grid">
+          <!-- Preenchido por JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="game-sidebar">
+      <div class="sidebar-section" id="hint-section">
+        <div class="sidebar-title">Precisa de ajuda?</div>
+        <button class="hint-btn" id="hint-btn" onclick="useHint()">💡 Ver dica (−50 pts)</button>
+        <div class="hint-text" id="hint-text"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          Glossário
+          <span style="font-size:10px;color:var(--blue)">sempre visível</span>
+        </div>
+        <div id="sidebar-glossary"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Progresso</div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-label">
+            <span>Missão <span id="prog-current">1</span> de 50</span>
+            <span id="prog-pct">2%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="prog-fill" style="width:2%"></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px" id="prog-completed">0 missões concluídas</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 8: DEBRIEFING
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-debrief">
+  <div id="debrief-content">
+    <!-- Preenchido por JS -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA 9: ESTATÍSTICAS
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-stats">
+  <div style="max-width:720px;margin:0 auto;padding:40px 24px;width:100%;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:40px">
+      <button class="back-btn" onclick="goTo('screen-home')" style="margin-bottom:0">← Voltar</button>
+      <h2 style="font-family:var(--display);font-size:26px;font-weight:700">Suas estatísticas</h2>
+    </div>
+
+    <!-- Streak e pontuação total -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:32px" id="stats-top"></div>
+
+    <!-- Progresso por modo -->
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:20px">Progresso por modo</div>
+      <div id="stats-progress"></div>
+    </div>
+
+    <!-- Conquistas -->
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:20px">Conquistas</div>
+      <div id="stats-achievements" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"></div>
+    </div>
+
+    <!-- Resetar -->
+    <div style="text-align:center;margin-top:32px">
+      <button class="btn-ghost" onclick="resetStats()" style="font-size:13px;padding:10px 24px;color:var(--red);border-color:var(--red)">
+        Resetar progresso
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// POLYFILLS — compatibilidade cross-browser
+// ═══════════════════════════════════════════
+
+// roundRect não existe em Firefox < 112 e Safari < 15.4
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = [r, r, r, r];
+    else if (!r) r = [0, 0, 0, 0];
+    const [tl, tr, br, bl] = Array.isArray(r) ? r : [r[0]||0, r[1]||0, r[2]||0, r[3]||0];
+    this.moveTo(x + tl, y);
+    this.lineTo(x + w - tr, y);
+    this.arcTo(x + w, y, x + w, y + tr, tr);
+    this.lineTo(x + w, y + h - br);
+    this.arcTo(x + w, y + h, x + w - br, y + h, br);
+    this.lineTo(x + bl, y + h);
+    this.arcTo(x, y + h, x, y + h - bl, bl);
+    this.lineTo(x, y + tl);
+    this.arcTo(x, y, x + tl, y, tl);
+    this.closePath();
+    return this;
+  };
+}
+
+// ═══════════════════════════════════════════
+// OPERAÇÕES REAIS — referências para badges
+// ═══════════════════════════════════════════
+const REAL_OPS = {
+  'I-01': { name: 'Não Seja um Laranja 4', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2024/11/pf-deflagra-operacao-nao-seja-um-laranja' },
+  'I-02': { name: 'Operação Poyais', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2022/12/policia-federal-indicia-seis-pessoas-na-operacao-poyais' },
+  'I-03': { name: 'Operação Obsidiana', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/abril/operacao-obsidiana' },
+  'I-06': { name: 'Operação Backyard', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2024/10/pf-desarticula-grupo-que-movimentou-r-1-6-bilhao-para-plataformas-estrangeiras-de-apostas' },
+  'I-09': { name: 'Operação Retorno Velado', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2024/12/pf-deflagra-operacao-contra-lavagem-de-dinheiro-e-fraudes-bancarias' },
+  'I-16': { name: 'Operação Spare', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/setembro/operacao-spare' },
+  'I-21': { name: 'Operação Carbono Oculto', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/agosto/operacao-carbono-oculto' },
+  'I-26': { name: 'Operação Spare', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/setembro/operacao-spare' },
+  'I-33': { name: 'Operação Spare', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/setembro/operacao-spare' },
+  'I-35': { name: 'Operação Quasar', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2025/08/pf-e-receita-federal-deflagram-operacoes-de-combate-ao-crime-organizado-no-setor-de-combustiveis' },
+  'I-37': { name: 'Não Seja um Laranja 4', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2024/11/pf-deflagra-operacao-nao-seja-um-laranja' },
+  'I-38': { name: 'Operação Concierge', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2024/08/pf-deflagra-operacao-concierge' },
+  'I-39': { name: 'Operação Colossus', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2022/09/copy_of_pf-e-receita-reprimem-crimes-de-evasao-de-divisas' },
+  'I-41': { name: 'Operação Kryptos', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2021/08/pf-desarticula-esquema-de-fraudes-bilionarias-envolvendo-criptomoedas' },
+  'I-46': { name: 'Operação Obsidiana', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/abril/operacao-obsidiana' },
+  'I-47': { name: 'Operação Fluxo Oculto', url: 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2026/maio/operacao-fluxo-oculto' },
+  'I-48': { name: 'Operação Red Fox', url: 'https://www.gov.br/pf/pt-br/assuntos/noticias/2026/06/pf-deflagra-operacao-contra-lavagem-de-dinheiro-e-trafico-internacional-de-armas-e-drogas' },
+  'I-49': { name: 'Grupo Huione / FinCEN 2025', url: 'https://www.fincen.gov/news/news-releases/fincen-issues-final-rule-severing-huione-group-us-financial-system' },
+};
+
+// ═══════════════════════════════════════════
+// SONS — Web Audio API, sem arquivo externo
+// ═══════════════════════════════════════════
+let audioCtx = null;
+let soundEnabled = JSON.parse(localStorage.getItem('yv_sound') ?? 'true');
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, type, duration, gainVal, delay = 0) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    const t = ctx.currentTime + delay;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(gainVal, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.start(t); osc.stop(t + duration);
+  } catch(e) {}
+}
+
+function soundClick()   { playTone(880, 'sine', 0.08, 0.15); }
+function soundCorrect() {
+  playTone(523, 'sine', 0.12, 0.18);
+  playTone(659, 'sine', 0.12, 0.18, 0.1);
+  playTone(784, 'sine', 0.2,  0.2,  0.2);
+}
+function soundWrong()   {
+  playTone(220, 'sawtooth', 0.15, 0.12);
+  playTone(180, 'sawtooth', 0.2,  0.1, 0.12);
+}
+function soundStreak()  {
+  [523,659,784,1047].forEach((f,i) => playTone(f,'sine',0.15,0.2,i*0.08));
+}
+function soundTimer()   { playTone(440, 'square', 0.05, 0.08); }
+function soundCoaf()    {
+  playTone(392,'sine',0.1,0.15);
+  playTone(523,'sine',0.18,0.2,0.12);
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('yv_sound', JSON.stringify(soundEnabled));
+  const btn = document.getElementById('sound-btn');
+  if (btn) btn.textContent = soundEnabled ? '🔊' : '🔇';
+  soundClick();
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  mode: null,
+  difficulty: null,
+  missionIndex: 0,
+  score: 0,
+  hintUsed: false,
+  timerInterval: null,
+  timeLeft: 0,
+  exposure: 0,
+  completedMissions: JSON.parse(localStorage.getItem('yv_completed') || '[]'),
+  selectedAlerts: new Set(),
+  selectedChoice: null,
+  missionDecision: null,
+  streak: parseInt(localStorage.getItem('yv_streak') || '0'),
+  totalScore: parseInt(localStorage.getItem('yv_total_score') || '0'),
+  correctCount: parseInt(localStorage.getItem('yv_correct') || '0'),
+  wrongCount: parseInt(localStorage.getItem('yv_wrong') || '0'),
+  bestStreak: parseInt(localStorage.getItem('yv_best_streak') || '0'),
+};
+
+// ═══════════════════════════════════════════
+// GLOSSÁRIO COMPLETO
+// ═══════════════════════════════════════════
+const GLOSSARY = [
+  { term: 'PLD', full: 'Prevenção à Lavagem de Dinheiro', def: 'Conjunto de políticas, controles e obrigações que fintechs e bancos devem seguir para impedir o uso do sistema financeiro para ocultar dinheiro de origem criminosa.' },
+  { term: 'FT', full: 'Financiamento do Terrorismo', def: 'Crime de fornecer recursos financeiros a pessoas, grupos ou atividades terroristas. Diferente da lavagem, o dinheiro pode ter origem lícita — o problema é a finalidade.' },
+  { term: 'COAF', full: 'Conselho de Controle de Atividades Financeiras', def: 'Unidade de Inteligência Financeira do Brasil. Recebe, analisa e dissemina informações sobre operações suspeitas de lavagem e financiamento do terrorismo.' },
+  { term: 'KYC', full: 'Know Your Customer — Conheça seu Cliente', def: 'Processo obrigatório de identificar, verificar e classificar cada cliente antes de abrir conta ou liberar serviços. Inclui documento, selfie, biometria e análise de renda.' },
+  { term: 'KYB', full: 'Know Your Business — Conheça seu Negócio', def: 'Versão do KYC para empresas. Vai além de validar o CNPJ: precisa identificar sócios, administradores, beneficiário final e verificar se a operação declarada faz sentido.' },
+  { term: 'MED', full: 'Mecanismo Especial de Devolução', def: 'Recurso do Pix que permite devolver valores transferidos em casos de fraude comprovada. Funciona por comunicação entre instituições, com bloqueio cautelar do valor.' },
+  { term: 'RIF', full: 'Relatório de Inteligência Financeira', def: 'Documento gerado pelo COAF com análise de informações sobre suspeitos de lavagem. É confidencial e serve de base para investigações policiais e judiciais.' },
+  { term: 'BCB', full: 'Banco Central do Brasil', def: 'Regulador do sistema financeiro brasileiro. Autoriza fintechs, emite normas de PLD/FT e fiscaliza o cumprimento das regras por instituições de pagamento e bancos.' },
+  { term: 'VASP', full: 'Virtual Asset Service Provider', def: 'Prestadora de serviços com criptoativos — exchanges, corretoras e plataformas de negociação. No Brasil, são chamadas de PSAVs e reguladas pelo Banco Central desde 2025.' },
+  { term: 'PEP', full: 'Pessoa Exposta Politicamente', def: 'Cliente com cargo público de relevância (ministro, vereador, diretor de estatal, etc.) ou familiar próximo desse cargo. Exige diligência reforçada no compliance.' },
+  { term: 'BaaS', full: 'Banking as a Service', def: 'Modelo em que um banco cede sua infraestrutura regulada para que fintechs operem serviços financeiros. Cria risco de opacidade quando a fintech não identifica bem seus clientes finais.' },
+  { term: 'CNAE', full: 'Classificação Nacional de Atividades Econômicas', def: 'Código que classifica a atividade econômica de uma empresa. Red flag clássico: empresa com CNAE de serviços simples movimentando volumes compatíveis com atacado internacional.' },
+  { term: 'OTC', full: 'Over the Counter', def: 'Negociação direta de criptoativos fora de exchange formal, geralmente com intermediário informal. Alta liquidez e baixa rastreabilidade tornam esse canal atraente para lavagem.' },
+  { term: 'FATF/GAFI', full: 'Financial Action Task Force / Grupo de Ação Financeira Internacional', def: 'Organismo internacional que define os padrões globais de combate à lavagem e ao financiamento do terrorismo. Seus relatórios de tipologias são referência mundial.' },
+  { term: 'AML', full: 'Anti-Money Laundering', def: 'Equivalente internacional do PLD. Conjunto de regras, controles e procedimentos para detectar e prevenir lavagem de dinheiro em instituições financeiras.' },
+  { term: 'DEX', full: 'Exchange Descentralizada', def: 'Plataforma de negociação de criptoativos sem intermediário central. Opera por contratos inteligentes. Dificulta identificação de usuários por ausência de KYC obrigatório.' },
+  { term: 'P2P', full: 'Peer to Peer', def: 'Transação direta entre duas pessoas, sem intermediário institucional. Em cripto, pode contornar controles de exchange. Usado em lavagem para dificultar rastreamento.' },
+  { term: 'PSAV', full: 'Prestadora de Serviços de Ativos Virtuais', def: 'Nome brasileiro para VASP. Regulada pela Resolução BCB nº 520/2025. Precisa ter autorização do Banco Central e manter programa de PLD/FT.' },
+  { term: 'IP', full: 'Internet Protocol', def: 'Endereço digital de um dispositivo na internet. Em compliance, múltiplas contas acessadas pelo mesmo IP é red flag de fraude ou conta laranja.' },
+  { term: 'Laranja', full: 'Conta ou pessoa laranja', def: 'Pessoa que cede ou tem sua conta usada para receber e repassar dinheiro ilícito, consciente ou não. Equivalente brasileiro de money mule.' },
+];
+
+// ═══════════════════════════════════════════
+// MISSÕES — INVESTIGADOR (50 missões)
+// ═══════════════════════════════════════════
+const MISSIONS_INV = [
+  // ─── FÁCIL 1-15 ───
+  {
+    id: 'I-01', title: 'Chuva de Pix', diff: 'easy',
+    type: 'Fracionamento + Conta Laranja',
+    briefing: {
+      concept: 'Fracionamento e Contas Laranja',
+      text: 'Fracionamento é dividir um valor grande em muitas transferências pequenas para dificultar a detecção. Laranjas são pessoas que emprestam ou vendem suas contas para receber e repassar dinheiro ilícito — conscientemente ou não. Juntos, formam o esquema mais comum no Brasil.',
+      exercise: {
+        type: 'identify',
+        title: 'Identifique os red flags no perfil abaixo:',
+        items: [
+          { text: 'Conta aberta há 3 dias', suspicious: true, explain: 'Conta muito nova com alta movimentação é red flag clássico de laranja.' },
+          { text: 'Nome: Maria Aparecida dos Santos, CPF válido', suspicious: false, explain: 'CPF válido por si só não é suspeito.' },
+          { text: '47 Pix recebidos de desconhecidos em 24h', suspicious: true, explain: 'Muitos créditos de terceiros sem relação aparente é red flag central.' },
+          { text: 'Repasse de 100% do saldo em 8 minutos', suspicious: true, explain: 'Pass-through rápido sem permanência de saldo é típico de conta de passagem.' },
+          { text: 'Mesmo dispositivo usado em 6 outras contas', suspicious: true, explain: 'Device fingerprint compartilhado é evidência de rede de laranjas.' },
+          { text: 'Reside em São Paulo/SP', suspicious: false, explain: 'Localização por si só não é red flag.' },
+        ]
+      }
+    },
+    alerts: [
+      { text: 'Conta aberta há 3 dias com movimentação de R$ 47.000' },
+      { text: 'Recebeu Pix de 47 pessoas físicas diferentes' },
+      { text: '100% do saldo repassado em sequência, em 8 minutos' },
+      { text: 'Mesmo dispositivo identificado em mais 5 contas' },
+      { text: 'Renda declarada: R$ 1.200/mês' },
+      { text: 'Nenhuma compra, serviço ou despesa pessoal identificada' },
+    ],
+    clientData: [
+      ['Nome', 'M.A. dos Santos'],
+      ['CPF', '***.***.***-**'],
+      ['Abertura da conta', '3 dias atrás'],
+      ['Renda declarada', { value: 'R$ 1.200/mês', flag: false }],
+      ['Movimentação (7d)', { value: 'R$ 47.230', flag: true }],
+      ['Nº de recebimentos', { value: '47 Pix', flag: true }],
+      ['Pass-through', { value: '100% em 8 min', flag: true }],
+      ['Dispositivos únicos', { value: '1 (compartilhado)', flag: true }],
+    ],
+    decisions: [
+      { label: 'Solicitar documentos de origem dos recursos', icon: '📄', type: 'neutral', points: 30 },
+      { label: 'Escalar para comitê de PLD', icon: '⬆️', type: 'neutral', points: 20 },
+      { label: 'Comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Encerrar como falso positivo', icon: '✕', type: 'danger', points: -80 },
+    ],
+    hint: 'Observe o medidor de pass-through: 100% do saldo sai em 8 minutos. Isso, combinado com o device compartilhado e a conta nova, forma o padrão clássico de conta laranja. A decisão correta reúne esses três elementos.',
+    debrief: {
+      result: 'correct',
+      correctDecision: 'Comunicar ao COAF com dossiê completo de rede.',
+      explanation: 'Este caso reúne quatro red flags simultâneos: conta nova, incompatibilidade de renda, pass-through imediato e device compartilhado. A combinação exige comunicação ao COAF, não apenas escalada interna.',
+      flow: [
+        [{ label: 'Vítimas de golpe', type: 'origin' }, { label: '→' }, { label: 'M.A. (laranja)', type: 'middle' }],
+        [{ label: '↓' }],
+        [{ label: 'Conta concentradora', type: 'middle' }, { label: '→' }, { label: 'Saque / Cripto', type: 'destination' }],
+        [{ label: '⚑ Detectado por device fingerprint', type: 'detection' }],
+      ],
+      flags: [
+        { text: 'Conta aberta há 3 dias', found: true },
+        { text: 'Renda incompatível com movimentação', found: true },
+        { text: 'Pass-through de 100% em 8 min', found: true },
+        { text: 'Device compartilhado em 6 contas', found: true },
+      ],
+      refs: [
+        {
+          icon: '📋', name: 'Circular BCB nº 3.978/2020',
+          full: 'Banco Central do Brasil — Norma de PLD/FT para instituições autorizadas',
+          plain: 'Exige que fintechs monitorem padrões de movimentação incompatíveis com o perfil do cliente. Se o dinheiro não faz sentido para aquela pessoa, precisa ser investigado.'
+        },
+        {
+          icon: '🚨', name: 'Carta Circular BCB nº 4.001/2020',
+          full: 'Catálogo de red flags regulatórios do Banco Central',
+          plain: 'Lista situações que já são red flag por definição regulatória, incluindo movimentação incompatível com renda e uso de contas de terceiros para receber e repassar valores.'
+        },
+        {
+          icon: '💸', name: 'Resolução BCB nº 1/2020 — MED',
+          full: 'Mecanismo Especial de Devolução do Pix',
+          plain: 'Cria o mecanismo de devolução do Pix para casos de fraude. Quando vítimas reclamam, o MED conecta as contas da cadeia e facilita o rastreamento.'
+        },
+      ]
+    }
+  },
+  {
+    id: 'I-02', title: 'Vaquinha Suspeita', diff: 'easy',
+    type: 'Crowdfunding Malicioso',
+    briefing: {
+      concept: 'Crowdfunding e Lavagem de Dinheiro',
+      text: 'Plataformas de arrecadação coletiva podem ser usadas para disfarçar origem de recursos. O organizador cria uma causa aparentemente legítima, recebe doações de muitas pessoas e redireciona os valores. O ponto crítico não é o canal — é o destino final do dinheiro.',
+      exercise: {
+        type: 'hypothesis',
+        title: 'Qual é o diagnóstico mais provável para esta campanha?',
+        scenario: 'Campanha "Ajuda Emergencial Família Silva" arrecadou R$ 89.000 em 72h via link de pagamento. O organizador não tem vínculo comprovado com os beneficiários declarados. Os recursos foram transferidos para 3 contas PJ recém-abertas em fintechs diferentes.',
+        options: [
+          { text: 'Campanha legítima com organização descentralizada. Encerrar como falso positivo.', correct: false, explain: 'Sem vínculo com beneficiários e transferência para PJs recém-criadas são red flags sérios que impedem encerramento sem análise.' },
+          { text: 'Indício de lavagem por colocação via plataforma de arrecadação. Escalar com dossiê.', correct: true, explain: 'Correto. Ausência de vínculo, velocidade de arrecadação e destino em PJs novas formam padrão suspeito que exige análise aprofundada.' },
+          { text: 'Fraude simples de engenharia social. Encaminhar para área de fraude apenas.', correct: false, explain: 'Pode ser fraude, mas o fluxo para PJs sugere estrutura de lavagem, não apenas golpe simples. PLD e fraude precisam atuar juntos.' },
+        ]
+      }
+    },
+    alerts: [
+      { text: 'Campanha arrecadou R$ 89.000 em 72 horas' },
+      { text: 'Organizador sem vínculo comprovado com beneficiários' },
+      { text: 'Recursos transferidos para 3 CNPJs abertos nos últimos 15 dias' },
+      { text: 'Dois dos CNPJs têm o mesmo endereço físico' },
+      { text: 'Nenhuma nota fiscal ou comprovante de uso apresentado' },
+      { text: 'Plataforma de arrecadação já recebeu reclamação de fraude' },
+    ],
+    clientData: [
+      ['Organizador', 'J.R. Mendonça'],
+      ['Campanha', '"Ajuda Família Silva"'],
+      ['Valor arrecadado', { value: 'R$ 89.000', flag: true }],
+      ['Prazo de arrecadação', { value: '72 horas', flag: true }],
+      ['Destino declarado', 'Assistência emergencial'],
+      ['Destino real', { value: '3 PJs novas', flag: true }],
+      ['Vínculo com beneficiários', { value: 'Não verificado', flag: true }],
+      ['Documentação', { value: 'Ausente', flag: true }],
+    ],
+    decisions: [
+      { label: 'Solicitar documentos de prestação de contas', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Bloquear preventivamente e escalar', icon: '🔒', type: 'neutral', points: 60, correct: true },
+      { label: 'Comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Encerrar — campanha humanitária legítima', icon: '✕', type: 'danger', points: -100 },
+    ],
+    hint: 'O ponto crítico aqui não é a arrecadação rápida em si — é o destino. Três PJs abertas nos últimos 15 dias com o mesmo endereço físico são uma estrutura improvisada de passagem, não destinatários legítimos.',
+    debrief: {
+      result: 'correct',
+      correctDecision: 'Bloquear preventivamente, solicitar documentação e comunicar ao COAF.',
+      explanation: 'Crowdfunding com destino em PJs recém-criadas e sem vínculo verificável com os beneficiários é tipologia documentada de colocação. O dinheiro entra com aparência de doação e sai como "repasse" para empresas de fachada.',
+      flow: [
+        [{ label: 'Doadores', type: 'origin' }, { label: '→' }, { label: 'Plataforma de vaquinha', type: 'middle' }],
+        [{ label: '↓' }],
+        [{ label: '3 PJs novas', type: 'middle' }, { label: '→' }, { label: 'Destino desconhecido', type: 'destination' }],
+        [{ label: '⚑ Detectado por ausência de vínculo e PJs novas', type: 'detection' }],
+      ],
+      flags: [
+        { text: 'Arrecadação de R$ 89k em 72h', found: true },
+        { text: 'Sem vínculo com beneficiários', found: true },
+        { text: '3 PJs abertas nos últimos 15 dias', found: true },
+        { text: 'Mesmo endereço físico em 2 PJs', found: true },
+      ],
+      refs: [
+        {
+          icon: '🌐', name: 'FATF — Crowdfunding for Terrorism Financing (2023)',
+          full: 'Relatório do FATF sobre uso de plataformas de arrecadação para fins ilícitos',
+          plain: 'O FATF documenta que campanhas humanitárias podem ser usadas como fachada para movimentar recursos, especialmente quando o destino é opaco e o organizador não tem vínculo verificável com os beneficiários.'
+        },
+        {
+          icon: '📋', name: 'Circular BCB nº 3.978/2020',
+          full: 'Política de PLD/FT para instituições autorizadas',
+          plain: 'Exige monitoramento de operações sem fundamento econômico aparente. Campanha que arrecada muito rápido e distribui para empresas novas sem documentação não tem fundamento verificável.'
+        },
+      ]
+    }
+  },
+  {
+    id: 'I-03', title: 'Salário que Não Existe', diff: 'easy',
+    type: 'Lavagem por Folha de Pagamento Fictícia',
+    briefing: {
+      concept: 'Empresa de Fachada e Folha de Pagamento',
+      text: 'Uma empresa de fachada parece legítima por fora mas não tem operação real. Um dos métodos de integração mais comuns é pagar "salários", "pró-labore" ou "comissões" a pessoas que, na prática, estão apenas repassando o dinheiro de volta ao arquiteto do esquema. Para o banco, parece receita empresarial normal.',
+      exercise: {
+        type: 'flow',
+        title: 'Ordene as etapas deste esquema de colocação a integração:',
+        steps: [
+          { text: 'Dinheiro ilícito entra na empresa via "receita de vendas" fictícia', order: 1 },
+          { text: 'Empresa paga "salários" e "comissões" a pessoas físicas', order: 2 },
+          { text: 'Pessoas físicas sacam ou transferem para o beneficiário real', order: 3 },
+          { text: 'Beneficiário real usa o dinheiro com aparência de renda lícita', order: 4 },
+        ]
+      }
+    },
+    alerts: [
+      { text: 'Empresa de consultoria com 0 clientes verificáveis' },
+      { text: '12 "funcionários" recebem salário mas não têm vínculo com FGTS/INSS' },
+      { text: 'Faturamento de R$ 340.000/mês sem nota fiscal emitida' },
+      { text: '100% dos salários são sacados no mesmo dia do crédito' },
+      { text: 'Sócios-administradores têm histórico de empresas encerradas' },
+    ],
+    clientData: [
+      ['CNPJ', '**.***.***/**01-**'],
+      ['CNAE', 'Consultoria de gestão'],
+      ['Data de abertura', { value: '18 dias atrás', flag: true }],
+      ['Nº de "funcionários"', { value: '12', flag: false }],
+      ['FGTS/INSS recolhido', { value: 'Nenhum', flag: true }],
+      ['Faturamento mensal', { value: 'R$ 340.000', flag: true }],
+      ['Notas fiscais emitidas', { value: '0', flag: true }],
+      ['Saque de salários', { value: '100% no dia D', flag: true }],
+    ],
+    decisions: [
+      { label: 'Solicitar contratos de prestação de serviço', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Verificar CNPJ no Simples/Receita Federal', icon: '🔎', type: 'neutral', points: 30 },
+      { label: 'Escalar e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Monitorar por mais 30 dias antes de agir', icon: '⏳', type: 'danger', points: -40 },
+    ],
+    hint: 'Uma empresa com faturamento de R$ 340k/mês que não emitiu uma única nota fiscal e não recolhe FGTS não é uma empresa real. O saque imediato dos salários sugere que os "funcionários" são laranjas.',
+    debrief: {
+      result: 'correct',
+      correctDecision: 'Escalar com dossiê e comunicar ao COAF.',
+      explanation: 'Empresa sem operação real, sem obrigações trabalhistas, com faturamento alto e saque imediato de 100% dos salários é estrutura de integração clássica. O dinheiro entra como "receita" e sai como "salário".',
+      flow: [
+        [{ label: 'Origem ilícita', type: 'origin' }, { label: '→' }, { label: 'Empresa fachada', type: 'middle' }],
+        [{ label: '↓ "salários"' }],
+        [{ label: '12 laranjas', type: 'middle' }, { label: '→' }, { label: 'Saque imediato', type: 'destination' }],
+        [{ label: '⚑ Detectado por ausência de FGTS e notas fiscais', type: 'detection' }],
+      ],
+      flags: [
+        { text: 'Empresa aberta há 18 dias com alto faturamento', found: true },
+        { text: 'Zero notas fiscais emitidas', found: true },
+        { text: '12 funcionários sem vínculo trabalhista formal', found: true },
+        { text: 'Saque de 100% dos salários no dia D', found: true },
+      ],
+      refs: [
+        {
+          icon: '📋', name: 'Circular BCB nº 3.978/2020',
+          full: 'Norma de PLD/FT do Banco Central',
+          plain: 'Exige análise de compatibilidade entre atividade declarada, porte da empresa e movimentação financeira. Empresa nova sem operação verificável movimentando centenas de milhares é incompatibilidade grave.'
+        },
+        {
+          icon: '🏛️', name: 'Lei nº 9.613/1998 — Lei de Lavagem de Dinheiro',
+          full: 'Define crimes de lavagem ou ocultação de bens, direitos e valores',
+          plain: 'A integração — usar o dinheiro lavado como se fosse legítimo — é a terceira fase da lavagem. Pagar "salários" com dinheiro ilícito para que pareça renda de trabalho é exatamente o que a lei combate.'
+        },
+      ]
+    }
+  },
+
+  // ─── Missões I-04 a I-15 (Fácil) resumidas mas funcionais ───
+  {
+    id: 'I-04', title: 'O Reembolso Rápido', diff: 'easy', type: 'Refund Laundering',
+    briefing: { concept: 'Refund Laundering', text: 'O criminoso faz uma compra e pede reembolso para uma conta diferente da original. O dinheiro muda de aparência: de "entrada suspeita" passa a ser "devolução comercial".',
+      exercise: { type: 'hypothesis', title: 'O que este padrão indica?', scenario: 'Merchant recebe R$ 12.000 via cartão, emite reembolso de R$ 11.800 para conta Pix diferente do cartão original, em nome de pessoa diferente do comprador.',
+        options: [
+          { text: 'Erro operacional comum. Encerrar sem ação.', correct: false, explain: 'Reembolso para instrumento e pessoa diferentes da compra não é erro operacional — é o padrão central do refund laundering.' },
+          { text: 'Refund laundering: a origem do dinheiro foi trocada. Escalar.', correct: true, explain: 'Correto. O dinheiro saiu como cartão e voltou como Pix para pessoa diferente — a "limpeza" aconteceu no reembolso.' },
+          { text: 'Chargeback legítimo. Documentar e seguir.', correct: false, explain: 'Chargeback legítimo vai para o mesmo instrumento e titular. Destino diferente é red flag grave.' },
+        ]
+      }
+    },
+    alerts: [{ text: 'Reembolso para conta diferente do pagador original' }, { text: 'Beneficiário do reembolso nunca fez compra no merchant' }, { text: 'Merchant tem 40% de taxa de reembolso no mês' }, { text: 'Valores reembolsados sempre próximos ao máximo permitido' }],
+    clientData: [['Merchant', 'Tech Digital Ltda'], ['Abertura', '22 dias'], ['Faturamento', { value: 'R$ 180.000', flag: false }], ['Taxa de reembolso', { value: '40%', flag: true }], ['Reembolso para titular diferente', { value: 'Sim', flag: true }], ['Instrumento do reembolso', { value: 'Diferente da compra', flag: true }]],
+    decisions: [
+      { label: 'Solicitar política de reembolso da empresa', icon: '📄', type: 'neutral', points: 30 },
+      { label: 'Escalar e bloquear merchant', icon: '🔒', type: 'confirm', points: 100, correct: true },
+      { label: 'Comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Monitorar sem ação', icon: '⏳', type: 'danger', points: -60 },
+    ],
+    hint: 'A chave está no destino do reembolso: pessoa e instrumento diferentes do pagador original. Reembolso legítimo sempre volta para quem pagou e como pagou.',
+    debrief: { result: 'correct', correctDecision: 'Bloquear merchant e comunicar ao COAF.',
+      explanation: 'Refund laundering usa o fluxo de reembolso para mudar a aparência da origem do dinheiro. O valor sai como cartão de uma pessoa e retorna como Pix para outra.',
+      flow: [[{ label: 'Comprador controlado', type: 'origin' }, { label: '→' }, { label: 'Merchant', type: 'middle' }], [{ label: '↓ reembolso' }], [{ label: 'Conta diferente', type: 'destination' }], [{ label: '⚑ Detectado por instrumento e titular diferentes', type: 'detection' }]],
+      flags: [{ text: 'Reembolso para pessoa diferente', found: true }, { text: '40% de taxa de reembolso', found: true }, { text: 'Merchant novo', found: true }, { text: 'Instrumento diferente', found: true }],
+      refs: [{ icon: '📋', name: 'Carta Circular BCB nº 4.001/2020', full: 'Red flags regulatórios do Banco Central', plain: 'Inclui reembolsos atípicos e movimentações sem fundamento econômico como indícios de lavagem.' }]
+    }
+  },
+  {
+    id: 'I-05', title: 'Conta que Só Passa', diff: 'easy', type: 'Conta de Passagem',
+    briefing: { concept: 'Pass-Through e Contas de Passagem', text: 'Uma conta de passagem não tem função econômica real: só recebe e repassa. Saldo médio baixo, alta rotatividade, sem pagamentos de despesas pessoais ou compras cotidianas.',
+      exercise: { type: 'identify', title: 'Identifique os sinais de pass-through:', items: [
+        { text: 'Saldo médio de R$ 87 em conta com movimentação de R$ 60.000/mês', suspicious: true, explain: 'Saldo médio irrisório com alta movimentação é o padrão clássico de pass-through.' },
+        { text: 'Nenhuma compra em supermercado, farmácia ou serviço cotidiano', suspicious: true, explain: 'Conta sem despesas pessoais não é usada como conta corrente — é usada como canal.' },
+        { text: 'Nome completo conferido com CPF', suspicious: false, explain: 'Dados corretos não eliminam suspeita de pass-through.' },
+        { text: 'Tempo médio de saldo na conta: 4 minutos', suspicious: true, explain: '4 minutos de permanência do dinheiro não é uso bancário — é repasse.' },
+      ]}
+    },
+    alerts: [{ text: 'Saldo médio R$ 87, movimentação R$ 60.000/mês' }, { text: 'Tempo médio de permanência do saldo: 4 minutos' }, { text: 'Zero compras, assinaturas ou despesas pessoais' }, { text: 'Recebe de 20+ origens, repassa para 3 destinos fixos' }],
+    clientData: [['Saldo médio', { value: 'R$ 87', flag: true }], ['Movimentação mensal', { value: 'R$ 60.000', flag: true }], ['Permanência do saldo', { value: '4 minutos', flag: true }], ['Despesas pessoais', { value: 'Nenhuma', flag: true }], ['Renda declarada', 'R$ 2.100/mês'], ['Destinos fixos', '3 contas']],
+    decisions: [
+      { label: 'Solicitar comprovante de origem dos recursos', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Aplicar diligência reforçada', icon: '🔎', type: 'neutral', points: 30 },
+      { label: 'Comunicar ao COAF e encerrar relacionamento', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Encerrar como falso positivo', icon: '✕', type: 'danger', points: -80 },
+    ],
+    hint: 'Quatro minutos de permanência do saldo não é comportamento bancário — é pipeline. Sem despesas pessoais, a conta não serve ao titular: serve ao esquema.',
+    debrief: { result: 'correct', correctDecision: 'Comunicar ao COAF e encerrar o relacionamento.',
+      explanation: 'Conta de passagem é o elemento mais simples de detectar: alto giro, baixo saldo médio, ausência de despesas pessoais e destinos fixos de repasse.',
+      flow: [[{ label: '20+ origens', type: 'origin' }, { label: '→' }, { label: 'Conta de passagem', type: 'middle' }], [{ label: '→' }], [{ label: '3 contas fixas', type: 'destination' }], [{ label: '⚑ Detectado por saldo médio e permanência', type: 'detection' }]],
+      flags: [{ text: 'Saldo médio de R$ 87', found: true }, { text: '4 minutos de permanência', found: true }, { text: 'Sem despesas pessoais', found: true }, { text: '3 destinos fixos de repasse', found: true }],
+      refs: [{ icon: '📋', name: 'Circular BCB nº 3.978/2020', full: 'Norma de PLD/FT', plain: 'Exige monitoramento de contas sem atividade econômica real. Conta que só serve de canal, sem função para o titular, é red flag operacional.' }]
+    }
+  },
+
+  // Missões I-06 a I-15 com estrutura completa
+  { id: 'I-06', title: 'Maquininha Fantasma', diff: 'easy', type: 'Merchant de Fachada',
+    briefing: { concept: 'Merchant de Fachada', text: 'Um merchant de fachada é credenciado como negócio legítimo mas só processa vendas fictícias para lavar dinheiro. O segredo está no KYB fraco: o CNPJ existe, mas o negócio não.', exercise: { type: 'identify', title: 'O que é suspeito neste merchant?', items: [
+      { text: 'Loja de eletrônicos com R$ 2,1 milhões em vendas no primeiro mês', suspicious: true, explain: 'Volume alto logo no primeiro mês de operação, sem histórico, é red flag grave.' },
+      { text: 'CNAE: Comércio varejista de eletrodomésticos', suspicious: false, explain: 'CNAE não é suspeito por si só.' },
+      { text: 'Site com 3 produtos cadastrados, sem carrinho funcional', suspicious: true, explain: 'Site inoperante para um merchant com R$ 2 milhões em vendas é incompatibilidade grave.' },
+      { text: 'Endereço: sala comercial de 9m²', suspicious: true, explain: 'Espaço incompatível com volume de vendas declarado.' },
+      { text: 'Zero chargebacks registrados', suspicious: true, explain: 'Volume alto sem qualquer chargeback é estatisticamente improvável em comércio real — pode indicar que as "vendas" são coordenadas pelo próprio grupo.' },
+    ]}},
+    alerts: [{ text: 'Merchant com 28 dias, faturamento de R$ 2,1 milhões' }, { text: 'Endereço: sala de 9m², sem estoque verificável' }, { text: 'Site com produto mas sem carrinho funcional' }, { text: 'Zero chargebacks em R$ 2mi de transações' }, { text: 'Compradores concentrados em 4 CPFs relacionados' }],
+    clientData: [['CNPJ', '**.***.***/**01-**'], ['Abertura', '28 dias'], ['CNAE', 'Comércio de eletrônicos'], ['Faturamento (1º mês)', { value: 'R$ 2,1 mi', flag: true }], ['Estoque verificável', { value: 'Nenhum', flag: true }], ['Chargebacks', { value: '0%', flag: true }], ['CPFs compradores únicos', { value: '4', flag: true }]],
+    decisions: [
+      { label: 'Solicitar nota fiscal e prova de entrega', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Visita ao endereço cadastrado', icon: '🏢', type: 'neutral', points: 50 },
+      { label: 'Suspender merchant e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Reduzir limite e monitorar', icon: '⚙️', type: 'danger', points: -30 },
+    ],
+    hint: 'Zero chargebacks em R$ 2 milhões de vendas é estatisticamente impossível em comércio real. Isso indica que os compradores e o vendedor fazem parte do mesmo esquema.',
+    debrief: { result: 'correct', correctDecision: 'Suspender merchant, exigir documentação e comunicar ao COAF.',
+      explanation: 'Merchant de fachada usa a estrutura de adquirência para converter dinheiro ilícito em faturamento aparentemente legítimo. A ausência de chargebacks, estoque e operação real são os sinais definitivos.',
+      flow: [[{ label: '4 compradores coordenados', type: 'origin' }, { label: '→' }, { label: 'Merchant fachada', type: 'middle' }], [{ label: '→ "faturamento"' }], [{ label: 'Conta PJ', type: 'destination' }], [{ label: '⚑ Detectado por zero chargeback e compradores relacionados', type: 'detection' }]],
+      flags: [{ text: 'Merchant com 28 dias e R$ 2,1 mi de faturamento', found: true }, { text: 'Zero chargebacks', found: true }, { text: 'Só 4 CPFs compradores', found: true }, { text: 'Endereço incompatível', found: true }],
+      refs: [{ icon: '📋', name: 'Carta Circular BCB nº 4.001/2020', full: 'Red flags de lavagem do Banco Central', plain: 'Inclui incompatibilidade entre atividade econômica declarada e movimentação financeira como indício de lavagem.' }]
+    }
+  },
+  { id: 'I-07', title: 'O Laranja de Boa Fé', diff: 'easy', type: 'Money Mule Não Consciente',
+    briefing: { concept: 'Distinguir Vítima de Cúmplice', text: 'Nem todo laranja é criminoso. Pessoas são enganadas com ofertas de emprego, romances, promessas de renda extra. A distinção importa para o compliance: o tratamento de uma vítima deve ser diferente de um cúmplice consciente.',
+      exercise: { type: 'hypothesis', title: 'Como classificar este caso?', scenario: 'Usuária de 68 anos recebeu R$ 43.000 de 15 desconhecidos após contato com "namorado online" que pediu que ela recebesse "honorários de trabalho" e repassasse 90% para um terceiro. Ela não sabia que era lavagem.',
+        options: [
+          { text: 'Cúmplice consciente. Encerrar conta e comunicar como suspeita.', correct: false, explain: 'Perfil de 68 anos, romance online e ausência de benefício financeiro próprio sugerem vítima de golpe, não participação consciente.' },
+          { text: 'Vítima de romance scam. Comunicar ao COAF como vítima, orientar e encerrar sem criminalizar.', correct: true, explain: 'Correto. O FBI classifica money mules não conscientes como vítimas. A comunicação ao COAF deve ocorrer, mas com distinção entre vítima e cúmplice.' },
+          { text: 'Falso positivo. Idosa não seria usada em esquema.', correct: false, explain: 'Europol documenta que grupos vulneráveis, incluindo idosos, são alvos preferenciais de recrutamento — consciente ou não.' },
+        ]
+      }
+    },
+    alerts: [{ text: 'Cliente de 68 anos recebeu R$ 43.000 de 15 desconhecidos' }, { text: 'Repassou 90% para terceiro "indicado pelo namorado online"' }, { text: 'Manteve conversas via WhatsApp com pessoa que descreve como namorado' }, { text: 'Benefício financeiro próprio: R$ 4.300 (10%)' }],
+    clientData: [['Idade', '68 anos'], ['Valor recebido', { value: 'R$ 43.000', flag: true }], ['Origens', { value: '15 desconhecidos', flag: true }], ['Repasse', { value: '90% para terceiro', flag: true }], ['Benefício próprio', 'R$ 4.300'], ['Contato com recrutador', { value: 'Romance online', flag: true }]],
+    decisions: [
+      { label: 'Comunicar ao COAF distinguindo vítima de cúmplice', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Orientar cliente sobre romance scam e encerrar conta', icon: '💬', type: 'confirm', points: 60, correct: true },
+      { label: 'Tratar como cúmplice consciente e bloquear', icon: '🔒', type: 'danger', points: -40 },
+      { label: 'Encerrar sem comunicar — só é vítima', icon: '✕', type: 'danger', points: -60 },
+    ],
+    hint: 'O benefício financeiro próprio (R$ 4.300, 10%) e o contexto de romance online indicam vítima, não cúmplice. A comunicação ao COAF ainda é obrigatória, mas a narrativa deve refletir o contexto.',
+    debrief: { result: 'correct', correctDecision: 'Comunicar ao COAF com distinção de vítima, orientar a cliente e encerrar o relacionamento.',
+      explanation: 'Money mules não conscientes são instrumentalizados por golpistas. A distinção importa porque influencia a narrativa do dossiê e o encaminhamento para autoridades.',
+      flow: [[{ label: 'Golpistas', type: 'origin' }, { label: '→ romance online →' }, { label: 'Vítima de 68 anos', type: 'middle' }], [{ label: '→ recebe e repassa →' }], [{ label: 'Conta do golpista', type: 'destination' }], [{ label: '⚑ Detectado por padrão de romance scam', type: 'detection' }]],
+      flags: [{ text: 'Cliente idosa — perfil vulnerável', found: true }, { text: '15 remetentes desconhecidos', found: true }, { text: 'Romance online como vetor', found: true }, { text: 'Repasse de 90% a terceiro', found: true }],
+      refs: [{ icon: '🌐', name: 'FBI — Money Mules', full: 'Guia do FBI sobre classificação de money mules', plain: 'O FBI classifica money mules como não conscientes, conscientes por cegueira deliberada e cúmplices. A classificação correta impacta o encaminhamento investigativo.' }]
+    }
+  },
+  { id: 'I-08', title: 'Gift Card Express', diff: 'easy', type: 'Abuso de Cartão Pré-Pago',
+    briefing: { concept: 'Cartões Pré-Pagos e Gift Cards', text: 'Gift cards e cartões pré-pagos são instrumentos de valor armazenado que podem ser usados para converter dinheiro em produto revendível ou valor transferível com baixa rastreabilidade.',
+      exercise: { type: 'identify', title: 'Quais comportamentos são suspeitos?', items: [
+        { text: 'Compra de 80 gift cards de R$ 500 em uma sessão', suspicious: true, explain: 'Volume alto de gift cards sem racional de presente é padrão de conversão de dinheiro em valor revendível.' },
+        { text: 'Pagamento via Pix de conta aberta há 2 dias', suspicious: true, explain: 'Conta nova comprando gift cards em massa é combinação crítica.' },
+        { text: 'Comprador tem 24 anos', suspicious: false, explain: 'Idade não é red flag isolado.' },
+        { text: 'Códigos dos gift cards enviados a 3 e-mails diferentes', suspicious: true, explain: 'Envio para múltiplos destinatários sugere distribuição organizada, não presentes pessoais.' },
+      ]}
+    },
+    alerts: [{ text: '80 gift cards de R$ 500 comprados em uma sessão (R$ 40.000)' }, { text: 'Pagamento via Pix de conta aberta há 2 dias' }, { text: 'Códigos enviados para 3 e-mails diferentes' }, { text: 'Mesmo IP já comprou gift cards em mais 4 plataformas' }],
+    clientData: [['Valor total', { value: 'R$ 40.000', flag: true }], ['Qtd gift cards', { value: '80 unidades', flag: true }], ['Conta do Pix', { value: '2 dias', flag: true }], ['Destinatários dos códigos', { value: '3 e-mails', flag: true }], ['IP em outras plataformas', { value: 'Sim — 4 plataformas', flag: true }]],
+    decisions: [
+      { label: 'Suspender a transação e solicitar justificativa', icon: '🔒', type: 'neutral', points: 50 },
+      { label: 'Comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Aprovar — gift card é uso legítimo', icon: '✕', type: 'danger', points: -80 },
+      { label: 'Limitar a 10 gift cards por sessão e monitorar', icon: '⚙️', type: 'neutral', points: 20 },
+    ],
+    hint: 'O IP aparecendo em 4 outras plataformas de gift card transforma um comportamento questionável em padrão: este comprador está convertendo dinheiro em valor revendível em múltiplos canais.',
+    debrief: { result: 'correct', correctDecision: 'Suspender, solicitar justificativa e comunicar ao COAF.',
+      explanation: 'Gift cards em massa são uma forma de converter dinheiro ilícito em valor transferível e revendível. O padrão em múltiplas plataformas confirma que é sistemático.',
+      flow: [[{ label: 'Dinheiro ilícito', type: 'origin' }, { label: '→' }, { label: '80 gift cards', type: 'middle' }], [{ label: '→ enviados a 3 e-mails →' }], [{ label: 'Revenda ou uso direto', type: 'destination' }], [{ label: '⚑ Detectado por IP em múltiplas plataformas', type: 'detection' }]],
+      flags: [{ text: '80 gift cards em uma sessão', found: true }, { text: 'Conta nova pagadora', found: true }, { text: '3 destinatários diferentes', found: true }, { text: 'IP em 4 outras plataformas', found: true }],
+      refs: [{ icon: '🌐', name: 'FATF — Risk-Based Approach to Prepaid Cards (2013)', full: 'Guia de risco para produtos pré-pagos', plain: 'O FATF identifica cartões pré-pagos como instrumentos de risco por combinarem valor armazenado, transferibilidade e baixa identificação de portador.' }]
+    }
+  },
+  { id: 'I-09', title: 'Pix do Desconhecido', diff: 'easy', type: 'Golpe com Dispersão via Pix',
+    briefing: { concept: 'Golpe e Dispersão Imediata por Pix', text: 'No golpe da falsa central, o criminoso se passa por banco ou governo, convence a vítima a transferir Pix para uma "conta segura" e dispersa o valor imediatamente por múltiplas contas antes do MED ser ativado.',
+      exercise: { type: 'flow', title: 'Ordene as etapas do golpe:', steps: [
+        { text: 'Vítima recebe ligação de "central antifraude do banco"', order: 1 },
+        { text: 'Criminoso convence vítima a fazer Pix para "conta de proteção"', order: 2 },
+        { text: 'Valor entra em conta laranja e é fragmentado em segundos', order: 3 },
+        { text: 'Fragmentos são dispersos antes do MED ser acionado', order: 4 },
+      ]}
+    },
+    alerts: [{ text: 'Conta recebe R$ 28.000 de vítima que depois aciona MED' }, { text: 'Valor dispersado em 11 Pix em 90 segundos' }, { text: 'Destinatários dos Pix têm contas abertas no mesmo dia' }, { text: 'Conta recebedora acessada por dispositivo desconhecido' }],
+    clientData: [['Valor recebido', { value: 'R$ 28.000', flag: true }], ['Tempo de dispersão', { value: '90 segundos', flag: true }], ['Nº de Pix enviados', { value: '11', flag: true }], ['Contas destino abertas', { value: 'Mesmo dia', flag: true }], ['MED acionado', { value: 'Sim — por vítima', flag: true }]],
+    decisions: [
+      { label: 'Acionar MED imediatamente', icon: '🔄', type: 'confirm', points: 80, correct: true },
+      { label: 'Bloquear conta e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Aguardar confirmação da vítima antes de agir', icon: '⏳', type: 'danger', points: -60 },
+      { label: 'Encerrar — valor já saiu', icon: '✕', type: 'danger', points: -80 },
+    ],
+    hint: 'O MED já foi acionado pela vítima. Isso é informação de fraude confirmada. A conta deve ser bloqueada imediatamente e todos os destinatários dos 11 Pix devem ser investigados como rede.',
+    debrief: { result: 'correct', correctDecision: 'Acionar MED, bloquear conta e comunicar ao COAF.',
+      explanation: 'Golpe com dispersão imediata via Pix é desenhado para superar o MED: 90 segundos não dão tempo para bloqueio. A investigação precisa seguir toda a rede de 11 destinatários.',
+      flow: [[{ label: 'Vítima (golpe)', type: 'origin' }, { label: '→ R$ 28.000 →' }, { label: 'Conta laranja', type: 'middle' }], [{ label: '→ 11 Pix em 90s →' }], [{ label: '11 contas destino', type: 'destination' }], [{ label: '⚑ Detectado por MED da vítima', type: 'detection' }]],
+      flags: [{ text: 'MED acionado pela vítima', found: true }, { text: '90 segundos de dispersão', found: true }, { text: '11 Pix para contas do mesmo dia', found: true }, { text: 'Device desconhecido', found: true }],
+      refs: [{ icon: '💸', name: 'Resolução BCB nº 103/2021 — MED', full: 'Mecanismo Especial de Devolução', plain: 'Criado pelo Banco Central para permitir devolução de Pix em casos de fraude confirmada. O bloqueio cautelar protege os fundos enquanto a investigação ocorre.' }]
+    }
+  },
+  { id: 'I-10', title: 'Empresa de Ontem', diff: 'easy', type: 'KYB Fraco — PJ Recém-Criada',
+    briefing: { concept: 'KYB — Por Que Validar a Empresa, Não Só o CNPJ', text: 'Um CNPJ ativo não significa empresa real. O KYB (Know Your Business) precisa ir além: verificar capacidade operacional, histórico, funcionários, presença física e coerência entre atividade declarada e faturamento esperado.',
+      exercise: { type: 'hypothesis', title: 'Esta empresa deve ser credenciada?', scenario: 'Empresa de logística com CNPJ ativo há 8 dias, nenhum funcionário no eSocial, endereço em residência particular, sem frota, sem contrato de cliente. Solicitou credenciamento para processar R$ 800.000/mês em subadquirência.',
+        options: [
+          { text: 'CNPJ ativo, credenciar normalmente.', correct: false, explain: 'CNPJ ativo sem operação real é empresa de fachada em potencial. Credenciar sem KYB é falha grave de compliance.' },
+          { text: 'Negar credenciamento e solicitar documentação operacional completa.', correct: true, explain: 'Correto. Empresa com 8 dias, sem funcionários e sem infraestrutura não tem capacidade operacional para processar R$ 800k/mês.' },
+          { text: 'Credenciar com limite reduzido de R$ 50.000/mês.', correct: false, explain: 'Limite reduzido não resolve o problema: a empresa não tem operação real e qualquer volume processado pode ser lavagem.' },
+        ]
+      }
+    },
+    alerts: [{ text: 'Empresa de logística com CNPJ de 8 dias' }, { text: 'Nenhum funcionário registrado no eSocial' }, { text: 'Endereço: residência particular' }, { text: 'Solicitou credenciamento para R$ 800k/mês' }, { text: 'Sócio com 3 empresas encerradas em 24 meses' }],
+    clientData: [['CNPJ criado há', { value: '8 dias', flag: true }], ['Funcionários (eSocial)', { value: '0', flag: true }], ['Endereço', { value: 'Residência particular', flag: true }], ['Frota verificável', { value: 'Nenhuma', flag: true }], ['Volume solicitado', { value: 'R$ 800k/mês', flag: true }], ['Histórico do sócio', { value: '3 empresas encerradas', flag: true }]],
+    decisions: [
+      { label: 'Solicitar contrato com cliente real, NF e comprovante de frota', icon: '📄', type: 'neutral', points: 50 },
+      { label: 'Negar credenciamento e registrar em blacklist interna', icon: '🔒', type: 'confirm', points: 100, correct: true },
+      { label: 'Credenciar com limite de R$ 50k e monitorar', icon: '⚙️', type: 'danger', points: -50 },
+      { label: 'Credenciar normalmente — CNPJ ativo', icon: '✕', type: 'danger', points: -100 },
+    ],
+    hint: 'O sócio com 3 empresas encerradas em 24 meses é o sinal mais importante além da data do CNPJ: é o perfil clássico de quem cria empresa após empresa para lavagem e encerra quando detectado.',
+    debrief: { result: 'correct', correctDecision: 'Negar credenciamento e registrar internamente.',
+      explanation: 'Empresa com 8 dias, sem operação verificável e sócio com histórico de empresas encerradas é estrutura de merchant de fachada. KYB é a defesa principal.',
+      flow: [[{ label: 'Origem ilícita', type: 'origin' }, { label: '→' }, { label: 'Merchant fachada (negado)', type: 'middle' }], [{ label: '⚑ Bloqueado no KYB', type: 'detection' }]],
+      flags: [{ text: 'CNPJ com 8 dias', found: true }, { text: 'Zero funcionários', found: true }, { text: 'Endereço residencial', found: true }, { text: 'Sócio com histórico de empresas encerradas', found: true }],
+      refs: [{ icon: '🏛️', name: 'Circular BCB nº 3.978/2020', full: 'Norma de PLD/FT', plain: 'Exige avaliação de beneficiário final, atividade econômica real e compatibilidade entre capacidade operacional e volume pretendido. Credenciar empresa sem operação real é falha de compliance com responsabilidade regulatória.' }]
+    }
+  },
+
+  // Missões I-11 a I-15
+  { id: 'I-11', title: 'Apostas e Pix', diff: 'easy', type: 'Lavagem via Plataforma de Bet',
+    briefing: { concept: 'Apostas Online e Lavagem de Dinheiro', text: 'Plataformas de apostas podem ser usadas para converter dinheiro ilícito em "ganhos". O padrão: depositar dinheiro sujo, fazer apostas mínimas (ou coordenadas para garantir resultado), e sacar como "prêmio".',
+      exercise: { type: 'identify', title: 'Identifique os sinais suspeitos:', items: [
+        { text: 'Depósito de R$ 50.000 e saque de R$ 49.800 após 2 apostas de baixo valor', suspicious: true, explain: 'Quase todo o dinheiro entrou e saiu sem apostar. O "ganho" encobre a origem.' },
+        { text: 'Conta de apostas criada há 1 dia antes do depósito', suspicious: true, explain: 'Conta nova com volume alto sugere que a plataforma foi escolhida como canal de lavagem.' },
+        { text: 'Usuário com histórico de apostas há 3 anos', suspicious: false, explain: 'Histórico longo é fator mitigante, não red flag.' },
+        { text: 'Depósito por Pix de conta diferente da do saque', suspicious: true, explain: 'Entrada e saída por instrumentos diferentes é padrão de mudança de aparência.' },
+      ]}
+    },
+    alerts: [{ text: 'Depósito de R$ 50.000, apenas 2 apostas de R$ 100' }, { text: 'Saque de R$ 49.800 declarado como "prêmio"' }, { text: 'Conta de bet criada há 1 dia' }, { text: 'Depósito por Pix de conta diferente da do saque' }],
+    clientData: [['Depósito', { value: 'R$ 50.000', flag: false }], ['Apostas realizadas', { value: '2 × R$ 100', flag: true }], ['Saque como "prêmio"', { value: 'R$ 49.800', flag: true }], ['Conta de bet', { value: '1 dia', flag: true }], ['Instrumento de entrada vs saída', { value: 'Diferentes', flag: true }]],
+    decisions: [
+      { label: 'Solicitar histórico de apostas e documentação', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Suspender saque e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Liberar saque — plataforma de bet é legal', icon: '✕', type: 'danger', points: -100 },
+      { label: 'Aplicar diligência reforçada e monitorar', icon: '🔎', type: 'neutral', points: 30 },
+    ],
+    hint: 'O lucro de uma aposta não pode ser maior que o valor apostado. R$ 49.800 de "prêmio" com R$ 200 apostados é matematicamente impossível — a plataforma foi usada apenas para trocar a aparência do dinheiro.',
+    debrief: { result: 'correct', correctDecision: 'Suspender saque e comunicar ao COAF.',
+      explanation: 'Lavagem via bet: depositar, apostar o mínimo e sacar como "ganho". O dinheiro muda de origem sem mudar de valor.',
+      flow: [[{ label: 'Dinheiro ilícito', type: 'origin' }, { label: '→' }, { label: 'Depósito na bet', type: 'middle' }], [{ label: '→ 2 apostas simbólicas →' }], [{ label: '"Prêmio" sacado', type: 'destination' }], [{ label: '⚑ Detectado por proporção depósito/aposta', type: 'detection' }]],
+      flags: [{ text: 'R$ 200 apostados, R$ 49.800 sacados', found: true }, { text: 'Conta nova na plataforma', found: true }, { text: 'Instrumento de entrada e saída diferentes', found: true }, { text: 'Sem histórico de apostas', found: true }],
+      refs: [{ icon: '🌐', name: 'Europol — Online Gambling and Money Laundering', full: 'Análise da Europol sobre apostas e lavagem', plain: 'A Europol documenta que plataformas de apostas online são vulneráveis a lavagem quando permitem depósito e saque sem verificação de compatibilidade entre valor apostado e "ganho".' }]
+    }
+  },
+  { id: 'I-12', title: 'Identidade Alugada', diff: 'easy', type: 'Abertura Massiva com Identidade Falsa',
+    briefing: { concept: 'Onboarding Fraudulento e Identidade Sintética', text: 'Identidade sintética combina dados reais e falsos para criar uma pessoa que não existe. Em fintechs com onboarding digital, isso é usado para abrir contas em massa que serão usadas como contas laranja.',
+      exercise: { type: 'identify', title: 'Identifique os sinais de onboarding fraudulento:', items: [
+        { text: '50 contas abertas em 48h com dados diferentes mas mesmo dispositivo', suspicious: true, explain: 'Mesmo device abrindo dezenas de contas é red flag definitivo de fraude de onboarding.' },
+        { text: 'Selfies com iluminação e ângulo idênticos em todas as contas', suspicious: true, explain: 'Selfies padronizadas podem indicar uso de fotos editadas ou geradas artificialmente.' },
+        { text: 'CPFs todos válidos no formato', suspicious: false, explain: 'CPF válido no formato não garante que a pessoa existe ou consente.' },
+        { text: 'E-mails seguindo padrão: nome.numero@domínio.com', suspicious: true, explain: 'E-mails gerados automaticamente com padrão incremental são sinal de criação em lote.' },
+      ]}
+    },
+    alerts: [{ text: '50 contas abertas em 48h pelo mesmo dispositivo' }, { text: 'Selfies com padrão de iluminação e ângulo idênticos' }, { text: 'E-mails no padrão nome.001@, nome.002@...' }, { text: 'Todas as contas movimentaram no primeiro dia' }],
+    clientData: [['Contas abertas', { value: '50 em 48h', flag: true }], ['Dispositivo único', { value: 'Sim', flag: true }], ['Padrão de selfie', { value: 'Idêntico', flag: true }], ['Padrão de e-mail', { value: 'Incremental', flag: true }], ['Movimentação no D0', { value: 'Todas', flag: true }]],
+    decisions: [
+      { label: 'Bloquear todas as 50 contas e investigar', icon: '🔒', type: 'confirm', points: 100, correct: true },
+      { label: 'Comunicar ao COAF com dossiê de rede', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Bloquear só as contas com movimentação', icon: '⚙️', type: 'danger', points: -30 },
+      { label: 'Solicitar novo processo de KYC para todas', icon: '📄', type: 'neutral', points: 20 },
+    ],
+    hint: 'Um único dispositivo abrindo 50 contas em 48 horas não é coincidência — é uma operação automatizada. Todas as contas fazem parte da mesma infraestrutura e devem ser tratadas como um único caso.',
+    debrief: { result: 'correct', correctDecision: 'Bloquear todas, comunicar ao COAF e investigar o device como hub.',
+      explanation: 'Onboarding fraudulento em massa cria infraestrutura para rede de laranjas. O device é o elemento unificador que conecta todas as 50 contas.',
+      flow: [[{ label: 'Operador com 1 device', type: 'origin' }, { label: '→ 50 contas →' }, { label: 'Rede de laranjas', type: 'middle' }], [{ label: '⚑ Detectado por device fingerprint', type: 'detection' }]],
+      flags: [{ text: '50 contas por 1 device', found: true }, { text: 'Selfies padronizadas', found: true }, { text: 'E-mails incrementais', found: true }, { text: 'Movimentação imediata em todas', found: true }],
+      refs: [{ icon: '📋', name: 'Circular BCB nº 3.978/2020', full: 'KYC e controles de onboarding', plain: 'Exige verificação de identidade com detecção de fraude e abordagem baseada em risco. Device intelligence e liveness detection são ferramentas esperadas em programas maduros de PLD/FT.' }]
+    }
+  },
+  { id: 'I-13', title: 'Transferência Circular', diff: 'easy', type: 'Pagamentos Circulares',
+    briefing: { concept: 'Circularidade Financeira', text: 'Pagamentos circulares criam a aparência de movimentação econômica sem que dinheiro real troque de mãos de forma legítima. A → B → C → A, ou múltiplas contas convergindo e divergindo para um concentrador.',
+      exercise: { type: 'flow', title: 'Monte o fluxo circular correto:', steps: [
+        { text: 'Conta A recebe R$ 10.000 de origem ilícita', order: 1 },
+        { text: 'Conta A paga R$ 9.900 para Conta B como "prestação de serviço"', order: 2 },
+        { text: 'Conta B paga R$ 9.800 para Conta C como "comissão"', order: 3 },
+        { text: 'Conta C paga R$ 9.700 de volta para Conta A como "consultoria"', order: 4 },
+      ]}
+    },
+    alerts: [{ text: 'Contas A, B e C transferem entre si R$ 290.000/mês' }, { text: 'Todas as 3 contas têm o mesmo endereço e responsável' }, { text: 'Notas fiscais emitidas: "consultoria" e "comissão" genéricas' }, { text: 'Nenhum pagamento a fornecedor ou prestador externo' }],
+    clientData: [['Contas relacionadas', { value: '3 — mesmo responsável', flag: true }], ['Volume total', { value: 'R$ 290.000/mês', flag: true }], ['Tipo de transação', { value: 'Só entre elas mesmas', flag: true }], ['Notas fiscais', { value: 'Genéricas', flag: true }], ['Fornecedores externos', { value: 'Nenhum', flag: true }]],
+    decisions: [
+      { label: 'Solicitar contratos e comprovantes de entrega', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Escalar com dossiê de circularidade e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Encerrar as 3 contas sem comunicar', icon: '⚙️', type: 'danger', points: -30 },
+      { label: 'Monitorar por 60 dias antes de agir', icon: '⏳', type: 'danger', points: -60 },
+    ],
+    hint: 'Três contas com o mesmo responsável pagando umas às outras sem qualquer fornecedor externo é uma operação fechada. Não há serviço real — só o mesmo dinheiro rodando para criar aparência de atividade.',
+    debrief: { result: 'correct', correctDecision: 'Comunicar ao COAF com análise de grafo das 3 contas.',
+      explanation: 'Circularidade financeira simula atividade econômica sem que dinheiro real troque de mãos de forma legítima. O grafo de vínculos entre as 3 contas é a evidência definitiva.',
+      flow: [[{ label: 'Conta A', type: 'origin' }, { label: '→ "consultoria" →' }, { label: 'Conta B', type: 'middle' }], [{ label: '↗ "comissão" ↙' }], [{ label: 'Conta C', type: 'middle' }, { label: '⚑ Circularidade detectada', type: 'detection' }]],
+      flags: [{ text: 'Mesmo responsável nas 3 contas', found: true }, { text: 'Só pagamentos internos', found: true }, { text: 'Notas genéricas sem entrega', found: true }, { text: 'Zero fornecedores externos', found: true }],
+      refs: [{ icon: '📋', name: 'FATF — Professional Money Laundering (2018)', full: 'Relatório sobre lavadores profissionais', plain: 'O FATF documenta circularidade financeira como técnica de ocultação. Estruturas que só movimentam entre si, sem razão econômica externa, são padrão de lavagem profissional.' }]
+    }
+  },
+  { id: 'I-14', title: 'O Fornecedor Invisível', diff: 'easy', type: 'Contrato sem Entrega Real',
+    briefing: { concept: 'Fornecedores Fictícios e Lavagem por Contrato', text: 'Uma das formas mais sofisticadas de integração é pagar por serviços que nunca foram entregues. O dinheiro sai como "pagamento de fornecedor" e chega como renda lícita ao beneficiário.',
+      exercise: { type: 'hypothesis', title: 'Qual é o diagnóstico?', scenario: 'Empresa de tecnologia paga R$ 180.000/mês a "consultoria estratégica" sem funcionários, sem CNPJ com história, sem entregável documentado. O sócio da consultoria é filho do sócio da empresa pagadora.',
+        options: [
+          { text: 'Legítimo — partes relacionadas podem negociar entre si.', correct: false, explain: 'Partes relacionadas com transação sem entregável documentado é red flag grave, não justificativa.' },
+          { text: 'Indício de lavagem por integração via contrato fictício. Escalar.', correct: true, explain: 'Correto. Partes relacionadas, sem entregável, sem operação real e com volume alto são os quatro elementos do contrato fictício.' },
+          { text: 'Apenas problema fiscal. Encaminhar à Receita sem comunicar ao COAF.', correct: false, explain: 'Pode ser problema fiscal também, mas o padrão configura indício de lavagem — COAF e Receita são complementares, não substitutos.' },
+        ]
+      }
+    },
+    alerts: [{ text: 'Pagamento de R$ 180.000/mês a consultoria sem funcionários' }, { text: 'Sócio da consultoria é filho do sócio da pagadora' }, { text: 'Zero entregável documentado em 8 meses de contrato' }, { text: 'Consultoria aberta 2 semanas antes do primeiro pagamento' }],
+    clientData: [['Pagamento mensal', { value: 'R$ 180.000', flag: false }], ['Consultoria — funcionários', { value: '0', flag: true }], ['Relação entre sócios', { value: 'Pai e filho', flag: true }], ['Entregável documentado', { value: 'Nenhum em 8 meses', flag: true }], ['Consultoria aberta', { value: '14 dias antes do contrato', flag: true }]],
+    decisions: [
+      { label: 'Solicitar contratos, escopo e comprovante de entrega', icon: '📄', type: 'neutral', points: 40 },
+      { label: 'Comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Encaminhar só à Receita Federal', icon: '⚙️', type: 'danger', points: -30 },
+      { label: 'Aguardar — partes relacionadas é legal', icon: '✕', type: 'danger', points: -80 },
+    ],
+    hint: '8 meses de pagamento, zero entregável documentado. Uma consultoria que cobra R$ 180k/mês sem produzir nada verificável não é uma consultoria — é um canal de integração.',
+    debrief: { result: 'correct', correctDecision: 'Solicitar documentação e comunicar ao COAF.',
+      explanation: 'Integração por contrato fictício é uma das técnicas mais difíceis de detectar porque usa estrutura jurídica legítima. A ausência de entregável é a evidência decisiva.',
+      flow: [[{ label: 'Empresa A (origem ilícita)', type: 'origin' }, { label: '→ R$ 180k/mês →' }, { label: 'Consultoria (fachada)', type: 'middle' }], [{ label: '→ renda "lícita" →' }], [{ label: 'Sócio filho', type: 'destination' }], [{ label: '⚑ Detectado por ausência de entregável', type: 'detection' }]],
+      flags: [{ text: 'Zero funcionários na consultoria', found: true }, { text: 'Partes relacionadas (pai/filho)', found: true }, { text: 'Zero entregável em 8 meses', found: true }, { text: 'Abertura 14 dias antes do contrato', found: true }],
+      refs: [{ icon: '🌐', name: 'FATF — Professional Money Laundering (2018)', full: 'Tipologias de lavagem profissional', plain: 'O FATF documenta profissionais de lavagem usando contratos fictícios, notas fiscais sem lastro e estruturas societárias para dar aparência de legalidade a pagamentos ilícitos.' }]
+    }
+  },
+  { id: 'I-15', title: 'Chip Novo Todo Mês', diff: 'easy', type: 'Rede de Laranjas por Device',
+    briefing: { concept: 'Device Fingerprint e Redes de Laranjas', text: 'Mesmo que alguém troque de telefone, número e conta, o comportamento biométrico e de device persiste. Device fingerprint é a impressão digital do aparelho — IP, sistema, padrão de toque, idioma — que conecta contas aparentemente distintas.',
+      exercise: { type: 'identify', title: 'Identifique os sinais de rede de laranjas:', items: [
+        { text: '1 device acessando 18 contas diferentes em 30 dias', suspicious: true, explain: 'Device único com 18 contas é infraestrutura de lavagem, não usuário com múltiplas contas.' },
+        { text: 'Contas com nomes, CPFs e telefones diferentes', suspicious: false, explain: 'Dados diferentes por si só não invalidam a suspeita — o device unifica a rede.' },
+        { text: 'Todas as contas recebem Pix e repassam no mesmo dia', suspicious: true, explain: 'Comportamento idêntico em todas as contas confirma coordenação.' },
+        { text: 'Geolocalização sempre na mesma área de 2km²', suspicious: true, explain: 'Área geográfica idêntica para 18 "pessoas" diferentes confirma operação centralizada.' },
+      ]}
+    },
+    alerts: [{ text: '1 device identificado em 18 contas diferentes' }, { text: 'Todas as 18 contas recebem Pix e repassam no mesmo dia' }, { text: 'Geolocalização das 18 contas: mesma área de 2km²' }, { text: 'Movimento total da rede: R$ 2,3 milhões em 30 dias' }],
+    clientData: [['Contas vinculadas ao device', { value: '18', flag: true }], ['Comportamento', { value: 'Idêntico em todas', flag: true }], ['Geolocalização', { value: 'Mesma área', flag: true }], ['Volume da rede', { value: 'R$ 2,3 mi / 30d', flag: true }], ['Perfis diferentes', 'Sim — nomes/CPFs únicos']],
+    decisions: [
+      { label: 'Bloquear o device e todas as 18 contas associadas', icon: '🔒', type: 'confirm', points: 80, correct: true },
+      { label: 'Comunicar ao COAF com análise de rede completa', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Bloquear só as contas com maior movimentação', icon: '⚙️', type: 'danger', points: -40 },
+      { label: 'Aguardar — dados cadastrais são todos diferentes', icon: '✕', type: 'danger', points: -100 },
+    ],
+    hint: 'O device é a prova que une as 18 contas. Sem ele, pareceriam clientes independentes. Com ele, são uma rede operada por uma única pessoa ou grupo.',
+    debrief: { result: 'correct', correctDecision: 'Bloquear device e todas as 18 contas. Comunicar ao COAF com dossiê de rede.',
+      explanation: 'Device fingerprint é um dos mais poderosos instrumentos de detecção de rede de laranjas. Dados cadastrais podem ser falsos, mas o device conecta as contas.',
+      flow: [[{ label: '1 operador com 1 device', type: 'origin' }, { label: '→' }, { label: '18 contas laranja', type: 'middle' }], [{ label: '→ R$ 2,3 mi →' }], { label: 'Concentradores' }, [{ label: '⚑ Detectado por device fingerprint', type: 'detection' }]],
+      flags: [{ text: '1 device — 18 contas', found: true }, { text: 'Comportamento idêntico', found: true }, { text: 'Mesma geolocalização', found: true }, { text: 'R$ 2,3 mi no período', found: true }],
+      refs: [{ icon: '📋', name: 'Circular BCB nº 3.978/2020', full: 'Controles de PLD/FT', plain: 'A norma exige controles de identificação e monitoramento que incluam análise de vínculos entre clientes. Device intelligence é uma das ferramentas esperadas em programas maduros.' }]
+    }
+  },
+
+  // ─── MÉDIO 16-35 ─── (estrutura resumida mas jogável)
+  { id: 'I-16', title: 'A Loja que Vende Nada', diff: 'medium', type: 'Merchant de Fachada + Integração',
+    briefing: { concept: 'KYB Avançado e Integração', text: 'No nível médio, o merchant de fachada é mais sofisticado: tem site funcional, CNAE compatível e notas fiscais. A detecção exige análise de rede entre compradores e vendedor.',
+      exercise: { type: 'hypothesis', title: 'Qual é o indicador decisivo?', scenario: 'Marketplace com R$ 3 milhões/mês em vendas. Site funcional, NFs emitidas. Mas 78% das vendas concentradas em 6 CPFs que compartilham endereço com o sócio da empresa.',
+        options: [
+          { text: 'Legítimo — site funcional e NFs emitidas.', correct: false, explain: 'Documentação formal não elimina suspeita quando compradores são relacionados ao vendedor.' },
+          { text: 'Vendas coordenadas entre partes relacionadas = integração.', correct: true, explain: 'Correto. 78% das vendas para relacionados ao sócio é a evidência decisiva.' },
+          { text: 'Possível evasão fiscal apenas. Encaminhar à Receita.', correct: false, explain: 'Pode ser também, mas o padrão configura lavagem — COAF deve ser comunicado.' },
+        ]
+      }
+    },
+    alerts: [{ text: 'R$ 3 milhões/mês em vendas no marketplace' }, { text: '78% das vendas para 6 CPFs relacionados ao sócio' }, { text: 'Logística: apenas 12% dos pedidos têm rastreamento real' }, { text: 'Notas fiscais emitidas, mas endereço de entrega = endereço do sócio' }, { text: 'Split de pagamento para 3 "afiliados" recém-criados' }],
+    clientData: [['Faturamento', { value: 'R$ 3 mi/mês', flag: false }], ['Compradores relacionados', { value: '78% — 6 CPFs', flag: true }], ['Logística verificável', { value: '12% com rastreamento', flag: true }], ['Endereço de entrega', { value: 'Mesmo do sócio', flag: true }], ['Afiliados', { value: '3 novos', flag: true }]],
+    decisions: [
+      { label: 'Solicitar romaneios de entrega e rastreamento', icon: '📄', type: 'neutral', points: 50 },
+      { label: 'Cruzar CPFs dos compradores com rede do sócio', icon: '🔎', type: 'neutral', points: 40 },
+      { label: 'Suspender e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+      { label: 'Reduzir split e monitorar', icon: '⚙️', type: 'danger', points: -40 },
+    ],
+    hint: 'O endereço de entrega coincidindo com o endereço do sócio nas NFs prova que as vendas não existem. Produto que "vai para o mesmo lugar que saiu" não foi vendido — foi lavado.',
+    debrief: { result: 'correct', correctDecision: 'Suspender merchant e comunicar ao COAF.',
+      explanation: 'Merchant de fachada no nível médio tem documentação formal mas entrega fictícia. A análise de rede entre compradores e sócio é a chave.',
+      flow: [[{ label: '6 CPFs relacionados', type: 'origin' }, { label: '→ "vendas" →' }, { label: 'Marketplace fachada', type: 'middle' }], [{ label: '→ split →' }], [{ label: '3 afiliados', type: 'destination' }], [{ label: '⚑ Detectado por endereço comum e logística falsa', type: 'detection' }]],
+      flags: [{ text: '78% vendas para relacionados', found: true }, { text: '88% sem rastreamento real', found: true }, { text: 'Entrega no endereço do próprio sócio', found: true }, { text: 'Afiliados novos recebendo split', found: true }],
+      refs: [{ icon: '📋', name: 'Carta Circular BCB nº 4.001/2020', full: 'Red flags regulatórios', plain: 'Inclui concentração de operações em partes relacionadas e incompatibilidade entre atividade declarada e operação real como indícios de lavagem.' }]
+    }
+  },
+
+  // Missões I-17 a I-35 com estrutura mínima mas funcional
+  ...Array.from({length: 19}, (_, i) => {
+    const idx = i + 17;
+    const mediumMissions = [
+      { id: 'I-17', title: 'Ledger Sem Fundo', type: 'Conta-Bolsão + BaaS Opaco', hint: 'A divergência entre o extrato bancário e o ledger interno é a evidência. Peça a conciliação granular.', alertText: 'Fintech intermediária com R$ 890 milhões em conta agregada sem identificação de clientes finais' },
+      { id: 'I-18', title: 'Stablecoin de Passagem', type: 'On-ramp / Off-ramp Cripto', hint: 'Trace o Pix de origem → compra de stablecoin → wallet externa → retorno. A velocidade da sequência é o red flag.', alertText: 'Cliente comprou R$ 340.000 em stablecoin 18 minutos após receber Pix de origem suspeita' },
+      { id: 'I-19', title: 'O Consultor Fantasma', type: 'Serviço Fictício de Consultoria', hint: 'Solicite prova de entrega. Em 12 meses, um consultor que cobra R$ 120k/mês deve ter produto verificável.', alertText: 'Contratos de R$ 120k/mês por 12 meses sem nenhum entregável verificável' },
+      { id: 'I-20', title: 'Pirâmide Disfarçada', type: 'Captação Irregular + Lavagem', hint: 'Promessa de retorno fixo em produto financeiro é captação ilegal. Comunicar ao COAF e ao Banco Central.', alertText: 'Plataforma promete 3% ao mês fixo em "fundo exclusivo" sem registro no BCB' },
+      { id: 'I-21', title: 'Combustível e Crime', type: 'Lavagem no Setor de Postos', hint: 'Compare o faturamento da rede de postos com a capacidade de venda real do setor. Inspirado em Carbono Oculto.', alertText: 'Rede de 40 postos com faturamento de R$ 180 milhões/mês — equivalente a 12 postos na média do setor' },
+      { id: 'I-22', title: 'Rede de Laranjas PJ', type: 'Empresas Interpostas', hint: 'Mapeie os sócios comuns entre os CNPJs. Estrutura de interpostas pessoas se revela pelo CPF que aparece em múltiplos CNPJs.', alertText: '8 CNPJs diferentes movimentando para o mesmo concentrador — 1 CPF aparece como sócio em todos' },
+      { id: 'I-23', title: 'Split Sem Destino', type: 'Abuso de Split de Pagamento', hint: 'Peça a lista de afiliados e verifique data de abertura e relação societária. Afiliados novos recebendo split alto são red flag.', alertText: 'Marketplace com split para 15 "afiliados" abertos na mesma semana, recebendo 40% de cada venda' },
+      { id: 'I-24', title: 'O Insider Silencioso', type: 'Funcionário Conivente', hint: 'O padrão de exceções manuais é a evidência. Funcionário que libera o mesmo tipo de cliente fora do processo padrão, repetidamente.', alertText: 'Analista aprovou 34 contas de alto risco manualmente, fora do fluxo padrão, em 60 dias' },
+      { id: 'I-25', title: 'Câmbio Paralelo Digital', type: 'OTC Broker Informal', hint: 'Múltiplos pagadores sem relação aparente para o mesmo recebedor é o padrão de doleiro digital. O volume pequeno por remetente esconde o volume total.', alertText: '280 pessoas físicas enviaram Pix para o mesmo CPF somando R$ 4,2 milhões em 30 dias' },
+      { id: 'I-26', title: 'Franquia de Fachada', type: 'Lavagem via Rede de Franquias', hint: 'Compare o faturamento da franquia com a média do setor e o número de unidades. Volume impossível para o porte é red flag. Inspirado em Spare.', alertText: 'Rede de 15 franquias de lanchonete com faturamento médio de R$ 800k/mês por unidade — 8× a média do setor' },
+      { id: 'I-27', title: 'Chargeback Coordenado', type: 'Chargeback Laundering', hint: 'Cruze os CPFs dos compradores que pedem chargeback com os dados do merchant. Parte relacionada pedindo chargeback é o sinal definitivo.', alertText: '90% dos chargebacks vêm de 4 CPFs que têm relação societária com o merchant' },
+      { id: 'I-28', title: 'Carteira Compartilhada', type: 'Device em Múltiplas Contas', hint: 'O device conecta as contas — não os nomes. Mapeie o grafo a partir do fingerprint do aparelho.', alertText: '1 tablet identificado em 42 contas de carteira digital com movimentação total de R$ 8,7 milhões' },
+      { id: 'I-29', title: 'O Empréstimo que Não Volta', type: 'Mútuo Artificial para Integração', hint: 'Mútuo sem garantia, sem histórico, sem plano de pagamento e de empresa nova para pessoa relacionada ao sócio é contrato fictício de integração.', alertText: 'Empresa de 20 dias concede mútuo de R$ 1,2 milhão ao filho do sócio sem garantia ou plano de pagamento' },
+      { id: 'I-30', title: 'Venda de Cripto Urgente', type: 'Off-ramp Suspeito Pós-Golpe', hint: 'A correlação temporal é decisiva: fraude → Pix → compra de cripto em 20 minutos. A velocidade prova que era um plano, não coincidência.', alertText: 'Cliente comprou R$ 210.000 em Bitcoin 20 minutos após vítima de golpe acionar MED contra seu número de Pix' },
+      { id: 'I-31', title: 'Marketplace de Ninguém', type: 'Sellers Falsos em Marketplace', hint: 'Compare o volume de pedidos com a capacidade logística. Marketplace com mil pedidos/dia e nenhum código de rastreamento não existe na prática.', alertText: 'Marketplace com 1.200 pedidos/dia declarados — 0 registros de postagem nos Correios ou transportadoras' },
+      { id: 'I-32', title: 'Remessa para Lugar Nenhum', type: 'Remessa Internacional Atípica', hint: 'Verifique o corredor de risco e o beneficiário. Sem vínculo familiar ou comercial verificável com o destino, é red flag de FT ou lavagem transnacional.', alertText: '120 clientes diferentes enviaram remessas mensais para o mesmo beneficiário em país monitorado pelo FATF' },
+      { id: 'I-33', title: 'Motel e Fintech', type: 'Lavagem via Negócio Incomum', hint: 'Faturamento de motel via fintech com volume 40× a média do setor local não é negócio — é canal. Inspirado em Spare.', alertText: 'Rede de 3 motéis processa R$ 22 milhões/mês via maquininhas de fintech — 40× a média do setor na região' },
+      { id: 'I-34', title: 'PEP na Cadeia', type: 'Beneficiário Final Oculto — PEP', hint: 'O PEP não aparece como sócio — aparece como beneficiário final oculto, duas camadas abaixo. KYB precisa ir até o beneficiário final.', alertText: 'Holding com 3 camadas societárias. Beneficiário final: secretário de estado com cargo público ativo' },
+      { id: 'I-35', title: 'O Fundo Opaco', type: 'Lavagem por Fundo de Investimento', hint: 'Fundo com estrutura que impede identificação de cotistas e com rentabilidade incompatível com risco declarado. Inspirado em Quasar.', alertText: 'Fundo com 0 cotistas identificáveis na CVM, rendimento de 4% ao mês declarado — sem ativo verificável' },
+    ];
+    const m = mediumMissions[i];
+    return {
+      id: m.id, title: m.title, diff: 'medium', type: m.type,
+      briefing: { concept: m.type, text: `Este caso envolve ${m.type.toLowerCase()}. No nível médio, os dados são misturados com informações legítimas. Identifique o padrão relevante.`, exercise: { type: 'hypothesis', title: 'Qual é a decisão correta?', scenario: m.alertText,
+        options: [
+          { text: 'Monitorar por mais 30 dias antes de agir.', correct: false, explain: 'O padrão já é suficiente para ação. Monitoramento prolongado sem motivo é falha de compliance.' },
+          { text: 'Escalar, documentar e comunicar ao COAF.', correct: true, explain: `Correto. ${m.hint}` },
+          { text: 'Encerrar como falso positivo.', correct: false, explain: 'O padrão identificado não é compatível com falso positivo.' },
+        ]
+      }},
+      alerts: [{ text: m.alertText }, { text: 'Red flag secundário identificado na análise de rede' }, { text: 'Beneficiário final não identificado ou obscuro' }],
+      clientData: [['Tipologia', m.type], ['Nível', 'Médio'], ['Volume suspeito', { value: 'Identificado', flag: true }], ['Rede de vínculos', { value: 'Presente', flag: true }]],
+      decisions: [
+        { label: 'Aprofundar análise e solicitar documentação', icon: '📄', type: 'neutral', points: 40 },
+        { label: 'Escalar e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 100, correct: true },
+        { label: 'Encerrar como falso positivo', icon: '✕', type: 'danger', points: -80 },
+        { label: 'Monitorar por 30 dias', icon: '⏳', type: 'danger', points: -40 },
+      ],
+      hint: m.hint,
+      debrief: { result: 'correct', correctDecision: 'Escalar e comunicar ao COAF com dossiê completo.',
+        explanation: `${m.type}: ${m.hint}`,
+        flow: [[{ label: 'Origem suspeita', type: 'origin' }, { label: '→' }, { label: 'Canal de lavagem', type: 'middle' }], [{ label: '→' }], [{ label: 'Integração / Destino', type: 'destination' }], [{ label: `⚑ Detectado via análise de ${m.type.toLowerCase()}`, type: 'detection' }]],
+        flags: [{ text: 'Red flag primário identificado', found: true }, { text: 'Red flag de rede identificado', found: true }, { text: 'Beneficiário final obscuro', found: true }],
+        refs: [{ icon: '📋', name: 'Circular BCB nº 3.978/2020 + Carta Circular 4.001/2020', full: 'Normas de PLD/FT do Banco Central', plain: 'Exigem monitoramento, análise de rede, identificação de beneficiário final e comunicação ao COAF quando há indício de lavagem.' }]
+      }
+    };
+  }),
+
+  // ─── DIFÍCIL 36-50 ───
+  ...Array.from({length: 15}, (_, i) => {
+    const idx = i + 36;
+    const hardTitles = [
+      'Stablecoin Express', 'Operação Laranja 4', 'Banco Paralelo', 'Cripto-Cabo',
+      'Ransomware em Reais', 'Pirâmide Transnacional', 'Crowdfunding Extremista',
+      'Rede de Mules Profissional', 'ONG de Cobertura', 'Chain Hopping Brasileiro',
+      'Fraude Tributária + Fintech', 'Combustível Bilionário', 'Tráfico de Armas e Pix',
+      'Plataforma de Crime', 'O Caso Completo'
+    ];
+    const hardTypes = [
+      'Multicamadas Pix + PJ + Cripto', 'Rede Nacional de Laranjas', 'BaaS como Infraestrutura',
+      'Evasão de Divisas por Cripto', 'Pagamento de Ransomware', 'Pirâmide Cripto Transnacional',
+      'Financiamento do Terrorismo', 'Money Mule Organizado', 'ONG de Cobertura para FT',
+      'Chain Hopping + Off-ramp', 'Fraude Tributária + Fintech', 'Esquema Híbrido Combustível',
+      'Lavagem para Tráfico', 'Infraestrutura de Lavagem', 'Investigação Multicamadas'
+    ];
+    const hardHints = [
+      'Trace cada etapa: Pix → PJ → exchange → stablecoin → wallet → off-ramp. A cadeia tem 7 elos.',
+      'O recrutador aparece conectado a todas as 80 contas. Encontre o hub. Inspirado em Não Seja um Laranja 4.',
+      'A fintech não é cliente — é infraestrutura. Peça a conciliação interna completa. Inspirado em Concierge.',
+      'Conecte os pontos de entrada e saída de fiat. O cripto no meio é a camada de ocultação. Inspirado em Colossus.',
+      'A empresa comprou cripto após incidente cibernético. Cruciais: timing, exchange e endereço da wallet destino.',
+      'Mais de 1 milhão de vítimas. Rastreie o fluxo internacional pelo ponto de saída fiat. Inspirado em Poyais.',
+      'O destino da cripto está em lista de sanções da ONU. Combine blockchain analytics com OSINT.',
+      'Europol + PF cooperaram. Encontre o hub da rede: quem coordena os mules em múltiplos países.',
+      'Parceiros locais não verificáveis + repasse para pessoa física em zona de conflito. Diligência reforçada.',
+      'A trilha atravessa 4 blockchains. Use análise on-chain + cruzamento com KYC dos pontos de saída.',
+      'Fintech criada para dificultar rastreamento de compensações tributárias fictícias. Inspirado em Obsidiana.',
+      'R$ 26 bilhões movimentados por 6 fintechs. Reconstrua a cadeia combustível → fintech → cripto. Inspirado em Fluxo Oculto.',
+      'Operação transnacional com Brasil e Suriname. Pix doméstico alimenta rede de tráfico internacional. Inspirado em Red Fox.',
+      'Ecossistema completo: fintech + PSAV + marketplace. Cada componente é um serviço de lavagem. Inspirado em Huione.',
+      'Todos os perfis, todos os canais, 10 atores, 9 etapas. Reconstrua o esquema do crime ao patrimônio.'
+    ];
+    return {
+      id: `I-${idx}`, title: hardTitles[i], diff: 'hard', type: hardTypes[i],
+      briefing: { concept: hardTypes[i], text: `Nível difícil: multicamadas, sem dicas, tempo limitado. ${hardHints[i]}`, exercise: { type: 'hypothesis', title: 'Qual é a decisão correta neste caso complexo?', scenario: `Caso ${hardTitles[i]}: ${hardHints[i]}`,
+        options: [
+          { text: 'Aguardar mais evidências antes de comunicar ao COAF.', correct: false, explain: 'No nível difícil, aguardar é a decisão errada. O padrão já justifica ação imediata.' },
+          { text: 'Comunicar ao COAF com dossiê completo de rede e aguardar resposta.', correct: true, explain: `Correto. ${hardHints[i]}` },
+          { text: 'Encerrar as contas envolvidas sem comunicar.', correct: false, explain: 'Encerrar sem comunicar é cumprimento parcial. COAF deve ser notificado para que autoridades possam investigar.' },
+        ]
+      }},
+      alerts: [
+        { text: `Caso multicamadas: ${hardTypes[i]}` },
+        { text: 'Múltiplos atores e jurisdições identificados' },
+        { text: 'Beneficiário final obscuro em estrutura societária complexa' },
+        { text: 'Volume total superior a R$ 10 milhões' },
+        { text: 'Ativos digitais identificados na rota' },
+      ],
+      clientData: [['Tipologia', hardTypes[i]], ['Nível', 'Difícil'], ['Dicas disponíveis', { value: 'Nenhuma', flag: true }], ['Tempo', { value: 'Limitado', flag: true }], ['Camadas', { value: 'Múltiplas', flag: true }]],
+      decisions: [
+        { label: 'Reconstruir cadeia completa e comunicar ao COAF', icon: '🚨', type: 'confirm', points: 150, correct: true },
+        { label: 'Solicitar cooperação internacional', icon: '🌐', type: 'confirm', points: 80, correct: true },
+        { label: 'Aguardar mais evidências', icon: '⏳', type: 'danger', points: -100 },
+        { label: 'Encerrar contas sem comunicar', icon: '✕', type: 'danger', points: -120 },
+      ],
+      hint: hardHints[i],
+      debrief: { result: 'correct', correctDecision: 'Comunicar ao COAF com dossiê multicamadas e solicitar cooperação quando necessário.',
+        explanation: `${hardTypes[i]}: ${hardHints[i]}`,
+        flow: [[{ label: 'Crime antecedente', type: 'origin' }, { label: '→' }, { label: 'Canal 1', type: 'middle' }, { label: '→' }, { label: 'Canal 2', type: 'middle' }], [{ label: '→' }], [{ label: 'Integração patrimonial', type: 'destination' }], [{ label: `⚑ Detectado via análise multicamadas`, type: 'detection' }]],
+        flags: [{ text: 'Tipologia principal identificada', found: true }, { text: 'Rede de atores mapeada', found: true }, { text: 'Ativos digitais rastreados', found: true }, { text: 'Beneficiário final identificado', found: true }],
+        refs: [
+          { icon: '📋', name: 'Circular BCB nº 3.978/2020', full: 'Norma de PLD/FT', plain: 'Exige análise aprofundada em casos de alto risco com múltiplos atores e camadas.' },
+          { icon: '🌐', name: 'FATF — Relatório relevante à tipologia', full: 'Relatório técnico do FATF', plain: 'O FATF documenta esta tipologia com red flags específicos e padrões de detecção.' },
+        ]
+      }
+    };
+  }),
+];
+
+// ═══════════════════════════════════════════
+// MISSÕES — CONSTRUTOR (50 missões)
+// ═══════════════════════════════════════════
+const MISSIONS_CON = MISSIONS_INV.map((m, i) => {
+  const conTitles = [
+    'Monte sua Rede', 'Escolha o Canal', 'A Empresa Perfeita', 'O Reembolso Perfeito',
+    'Conta de Passagem', 'Maquininha Perfeita', 'Recrute o Laranja', 'Gift Card Express',
+    'O Golpe Perfeito', 'Abra a Empresa', 'Aposta Garantida', 'Identidade Falsa',
+    'Pagamentos Circulares', 'O Fornecedor Perfeito', 'Chip Novo', 'A Loja Fachada',
+    'Monte o BaaS', 'Compre Cripto', 'O Consultor', 'A Pirâmide',
+    'Combustível e Crime', 'Empresa de Papel', 'Monte o Split', 'Corrompa o Insider',
+    'Câmbio Paralelo', 'A Franquia', 'Chargeback Coordenado', 'Rede de Carteiras',
+    'O Mútuo Falso', 'Cripto Urgente', 'Marketplace Falso', 'A Remessa', 'Motel Digital',
+    'PEP Oculto', 'O Fundo Fantasma', 'Stablecoin Express', 'Rede Nacional',
+    'Banco Paralelo', 'Cripto-Cabo', 'Resgate em Cripto', 'Pirâmide Global',
+    'Crowdfunding Extremista', 'Rede Global de Mules', 'ONG de Cobertura',
+    'Chain Hopping', 'Fraude Tributária', 'Combustível Bilionário',
+    'Tráfico e Pix', 'Infraestrutura do Crime', 'O Esquema Completo'
+  ];
+  const conTypes = [
+    'Escolha quantos laranjas usar — mais laranjas = mais device fingerprints detectáveis.',
+    'Compare Pix vs boleto vs cripto — cada canal deixa rastro diferente.',
+    'Escolha CNAE, sócios e volume — incompatibilidade = alerta automático.',
+    'Decida para onde redirecionar o reembolso — instrumento diferente da compra gera alerta.',
+    'Quanto tempo deixar o dinheiro parar? Velocidade é red flag primário.',
+    'Escolha CNAE e volume — CNAE incompatível + volume alto = detecção imediata.',
+    'Onde recrutar e qual perfil? Recrutamento deixa trilha digital.',
+    'Quantos cartões e como carregar? Múltiplos no mesmo device = alerta.',
+    'Qual canal de golpe e como dispersar? Velocidade determina detecção pelo MED.',
+    'Qual setor, quantos funcionários? Empresa sem operação real é detectada no KYB.',
+    'Quanto apostar para "limpar"? A proporção depósito/aposta revela o esquema.',
+    'Quantas contas abrir e por qual fintech? Mesmo device em várias contas é fatal.',
+    'Monte o circuito A→B→C→A. Circularidade é detectável por grafo.',
+    'Qual serviço contratar ficticiamente? Nota fiscal sem lastro é rastreável.',
+    'Troque dispositivo, chip e conta — comportamento biométrico persiste.',
+    'Sócio, CNAE, volume: cada detalhe aumenta ou reduz exposição.',
+    'Quantas subcontas e qual conciliação? Auditor pede granularidade.',
+    'Qual exchange, qual valor, qual timing? Compra pós-fraude é correlacionada.',
+    'Que serviço cobrar e como documentar? Sem entregável, o contrato cai.',
+    'Qual retorno prometer? Retorno fixo = captação ilegal.',
+    'Como usar fintech para ocultar volume de postos? e-Financeira cruza tudo.',
+    'Sócios comuns em CNPJs = rede detectável.',
+    'Quantos afiliados? Concentração de novos afiliados é red flag.',
+    'O que pedir ao insider sem se expor? Log de acesso registra tudo.',
+    'Quantos pagadores para o mesmo recebedor? Padrão de doleiro digital.',
+    'Volume por unidade × média do setor = incompatibilidade detectável.',
+    'CPFs dos compradores relacionados ao merchant = chargeback coordenado.',
+    'Device conecta todas as carteiras — dados distintos não eliminam o link.',
+    'Mútuo sem garantia a pessoa relacionada = contrato fictício.',
+    'Velocidade entre fraude e compra de cripto = correlação temporal.',
+    'Volume de pedidos vs logística real = incompatibilidade detectável.',
+    'Corredor de risco + beneficiário sem vínculo = red flag de FT.',
+    'Faturamento de motel × média do setor = incompatibilidade.',
+    'PEP oculto em holding = obrigação de identificar beneficiário final.',
+    'Rentabilidade impossível = captação ilegal.',
+    'Sete etapas de lavagem: cada uma deixa rastro.',
+    'Recrutador como hub: ele conecta as 80 contas.',
+    'Fintech como banco paralelo: conciliação interna revela tudo.',
+    'Cripto como camada: entrada e saída de fiat são os pontos vulneráveis.',
+    'Timing + exchange + wallet destino = prova do plano.',
+    'Ponto de saída fiat em esquema transnacional: é onde acontece a detecção.',
+    'Lista de sanções + blockchain analytics = caso de FT.',
+    'Hub da rede: coordenador de mules em múltiplos países.',
+    'Parceiro local não verificável em zona de conflito.',
+    'Quatro blockchains: os pontos de conversão são rastreáveis.',
+    'Fintech criada para encobrir: KYB da fintech é a chave.',
+    'Seis fintechs com R$ 26bi: reconstrução da cadeia.',
+    'Pix doméstico → tráfico internacional: o elo doméstico é rastreável.',
+    'Ecossistema completo: cada serviço é um ponto de detecção.',
+    'Dez atores, nove etapas: o esquema completo sempre tem o elo fraco.',
+  ];
+  return {
+    ...m,
+    id: `C-${String(i+1).padStart(2,'0')}`,
+    title: conTitles[i] || `Construtor ${i+1}`,
+    mode: 'construtor',
+    briefing: {
+      ...m.briefing,
+      concept: 'Perspectiva do Construtor',
+      text: `Agora você está do outro lado. ${conTypes[i]} Cada decisão aumenta ou reduz seu medidor de exposição. O objetivo é aprender por que cada técnica deixa rastro — e por que nenhum esquema é invisível.`,
+    },
+    decisions: [
+      { label: 'Usar muitos laranjas para dispersar', icon: '👥', type: 'danger', points: -20, exposure: 30 },
+      { label: 'Usar poucos laranjas com perfil elaborado', icon: '🎭', type: 'neutral', points: 20, exposure: 15 },
+      { label: 'Adicionar camada de cripto', icon: '₿', type: 'neutral', points: 30, exposure: 20 },
+      { label: 'Tentar limpar o esquema sem novas camadas', icon: '🧹', type: 'confirm', points: 0, exposure: 50, correct: true },
+    ],
+    debrief: {
+      ...m.debrief,
+      result: 'learning',
+      correctDecision: `Aprenda o ponto de falha: ${conTypes[i]}`,
+      explanation: `No modo construtor, a lição é: ${conTypes[i]} Todo rastro que você deixou seria detectado por um bom programa de PLD/FT.`,
+    }
+  };
+});
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goTo(screenId) {
+  // Limpa timer se sair do jogo por qualquer caminho
+  if (screenId !== 'screen-game' && state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+  // Remove opacity residual de transições anteriores
+  const gameEl = document.getElementById('screen-game');
+  if (gameEl) { gameEl.style.opacity = ''; gameEl.style.transition = ''; }
+  const debEl = document.getElementById('screen-debrief');
+  if (debEl) { debEl.style.opacity = ''; debEl.style.transition = ''; }
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function selectMode(mode) {
+  soundClick();
+  state.mode = mode;
+  // Reset exposure e score de sessão anterior ao trocar de modo
+  state.exposure = 0;
+  state.score = 0;
+  const badge = document.getElementById('diff-mode-badge');
+  badge.textContent = mode === 'investigador' ? '🔍 Investigador' : '🏗️ Construtor';
+  badge.className = 'diff-mode-badge ' + (mode === 'investigador' ? 'badge-inv' : 'badge-con');
+  goTo('screen-difficulty');
+}
+
+function selectDifficulty(diff) {
+  soundClick();
+  state.difficulty = diff;
+  // Limpa intervalo de timer de sessão anterior se houver
+  if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+  renderMissions();
+  goTo('screen-missions');
+}
+
+function filterMissions(diff, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMissions(diff);
+}
+
+function renderMissions(filterDiff = 'all') {
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const title = document.getElementById('missions-title');
+  title.textContent = state.mode === 'investigador' ? '🔍 Missões — Investigador' : '🏗️ Missões — Construtor';
+
+  const grid = document.getElementById('missions-grid');
+  grid.innerHTML = '';
+
+  missions.forEach((m, idx) => {
+    if (filterDiff !== 'all' && m.diff !== filterDiff) return;
+    const isCompleted = state.completedMissions.includes(m.id);
+    const op = REAL_OPS[m.id];
+    const card = document.createElement('div');
+    card.className = `mission-card ${m.diff}${isCompleted ? ' completed' : ''}`;
+
+    card.innerHTML = `
+      <div class="mission-card-id">${m.id}</div>
+      <div class="mission-card-title">${m.title}</div>
+      <div class="mission-card-type">${m.type}</div>
+      ${op ? `<div class="mission-op-badge"><span class="mission-op-dot"></span>${op.name}</div>` : ''}
+      <div class="mission-diff-badge diff-${m.diff}">${m.diff === 'easy' ? 'Fácil' : m.diff === 'medium' ? 'Médio' : 'Difícil'}</div>
+      ${isCompleted ? '<div class="mission-completed-badge">✅</div>' : ''}
+    `;
+    card.onclick = () => { soundClick(); startMission(idx); };
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════
+// BRIEFING
+// ═══════════════════════════════════════════
+function startMission(idx) {
+  state.missionIndex = idx;
+  state.score = 0;
+  state.hintUsed = false;
+  state.exposure = 0;
+  state.selectedAlerts = new Set();
+  state.missionDecision = null;
+
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const mission = missions[idx];
+
+  document.getElementById('briefing-mission-id').textContent = mission.id;
+  document.getElementById('briefing-mission-title').textContent = mission.title;
+
+  renderBriefing(mission);
+  renderBriefingGlossary(mission);
+  goTo('screen-briefing');
+}
+
+function renderBriefing(mission) {
+  const main = document.getElementById('briefing-main');
+  const ex = mission.briefing.exercise;
+  let exerciseHTML = '';
+
+  if (ex.type === 'identify') {
+    const shuffled = [...ex.items].sort(() => Math.random() - 0.5);
+    // USA data-attributes para evitar escape de strings em onclick
+    exerciseHTML = `
+      <div class="briefing-interactive">
+        <div class="briefing-interactive-title">🎯 ${ex.title}</div>
+        <div class="identify-items" id="identify-items">
+          ${shuffled.map((item) => {
+            const safeExplain = item.explain.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+            return `
+            <div class="identify-item"
+                 data-suspicious="${item.suspicious}"
+                 data-explain="${safeExplain}">
+              <div class="identify-icon">🔍</div>
+              <div>
+                <div class="identify-text">${item.text}</div>
+                <div class="identify-explain"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="briefing-feedback" id="briefing-feedback"></div>
+      </div>
+    `;
+  } else if (ex.type === 'flow') {
+    const shuffled = [...ex.steps].sort(() => Math.random() - 0.5);
+    exerciseHTML = `
+      <div class="briefing-interactive">
+        <div class="briefing-interactive-title">🔄 ${ex.title}</div>
+        <div class="flow-steps" id="flow-steps">
+          ${shuffled.map((step, i) => `
+            <div class="flow-step-item" draggable="true" data-order="${step.order}">
+              <span class="flow-step-num">${i+1}</span>
+              <span class="flow-step-text">${step.text}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;gap:12px;margin-top:16px">
+          <button class="briefing-skip-btn" onclick="checkFlow()">Verificar ordem</button>
+        </div>
+        <div class="briefing-feedback" id="briefing-feedback"></div>
+      </div>
+    `;
+  } else if (ex.type === 'hypothesis') {
+    // USA data-attributes para evitar escape de strings em onclick
+    exerciseHTML = `
+      <div class="briefing-interactive">
+        <div class="briefing-interactive-title">💭 ${ex.title}</div>
+        ${ex.scenario ? `<div style="font-size:14px;color:var(--text-dim);margin-bottom:16px;padding:14px;background:var(--panel);border-radius:8px;line-height:1.6">${ex.scenario}</div>` : ''}
+        <div class="hypothesis-options">
+          ${ex.options.map((opt) => {
+            const safeExplain = opt.explain.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+            return `
+            <div class="hypothesis-option"
+                 data-correct="${opt.correct}"
+                 data-explain="${safeExplain}">
+              ${opt.text}
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="briefing-feedback" id="briefing-feedback"></div>
+      </div>
+    `;
+  }
+
+  main.innerHTML = `
+    <div class="briefing-label">📚 Briefing — Conceito desta missão</div>
+    <h2 class="briefing-concept-title">${mission.briefing.concept}</h2>
+    <p class="briefing-text">${mission.briefing.text}</p>
+    ${exerciseHTML}
+    <button class="briefing-continue-btn visible" onclick="startGame()">Iniciar missão →</button>
+  `;
+
+  // Registra eventos via addEventListener (sem onclick inline)
+  if (ex.type === 'identify') {
+    document.querySelectorAll('.identify-item').forEach(el => {
+      el.addEventListener('click', () => toggleFlag(el));
+    });
+  }
+  if (ex.type === 'hypothesis') {
+    document.querySelectorAll('.hypothesis-option').forEach(el => {
+      el.addEventListener('click', () => selectHypothesis(el));
+    });
+  }
+  if (ex.type === 'flow') setupFlowDnD();
+}
+
+function toggleFlag(el) {
+  if (el.classList.contains('confirmed-flag') || el.classList.contains('confirmed-ok')) return;
+  const isSuspicious = el.dataset.suspicious === 'true';
+  const explain = el.dataset.explain || '';
+  const explanDiv = el.querySelector('.identify-explain');
+  explanDiv.textContent = explain;
+
+  if (isSuspicious) {
+    el.classList.add('confirmed-flag');
+    el.querySelector('.identify-icon').textContent = '🚨';
+  } else {
+    el.classList.add('confirmed-ok');
+    el.querySelector('.identify-icon').textContent = '✓';
+  }
+
+  const items = document.querySelectorAll('.identify-item');
+  const allDone = [...items].every(i => i.classList.contains('confirmed-flag') || i.classList.contains('confirmed-ok'));
+  if (allDone) {
+    const found = [...items].filter(i => i.classList.contains('confirmed-flag')).length;
+    const fb = document.getElementById('briefing-feedback');
+    fb.textContent = `Você identificou ${found} red flags. Agora você conhece os sinais desta tipologia.`;
+    fb.classList.add('visible');
+  }
+}
+
+function selectHypothesis(el) {
+  if (el.classList.contains('disabled')) return;
+  const isCorrect = el.dataset.correct === 'true';
+  const explain = el.dataset.explain || '';
+  document.querySelectorAll('.hypothesis-option').forEach(o => o.classList.add('disabled'));
+  const fb = document.getElementById('briefing-feedback');
+  if (isCorrect) {
+    el.classList.add('correct');
+    fb.textContent = 'Correto! ' + explain;
+    fb.classList.add('visible');
+  } else {
+    el.classList.add('incorrect');
+    fb.textContent = explain;
+    fb.classList.add('visible', 'error');
+  }
+}
+
+let dragSrc = null;
+function setupFlowDnD() {
+  setTimeout(() => {
+    const items = document.querySelectorAll('.flow-step-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', e => { dragSrc = item; item.classList.add('dragging'); });
+      item.addEventListener('dragend', e => { item.classList.remove('dragging'); });
+      item.addEventListener('dragover', e => { e.preventDefault(); });
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrc !== item) {
+          const container = item.parentNode;
+          const items = [...container.querySelectorAll('.flow-step-item')];
+          const srcIdx = items.indexOf(dragSrc);
+          const dstIdx = items.indexOf(item);
+          if (srcIdx < dstIdx) container.insertBefore(dragSrc, item.nextSibling);
+          else container.insertBefore(dragSrc, item);
+          // Update numbers
+          [...container.querySelectorAll('.flow-step-item')].forEach((it, i) => {
+            it.querySelector('.flow-step-num').textContent = i+1;
+          });
+        }
+      });
+    });
+  }, 100);
+}
+
+function checkFlow() {
+  const items = [...document.querySelectorAll('.flow-step-item')];
+  let correct = 0;
+  items.forEach((item, i) => {
+    const expectedOrder = i + 1;
+    const actualOrder = parseInt(item.dataset.order);
+    if (actualOrder === expectedOrder) { item.classList.add('correct'); correct++; }
+    else item.classList.add('incorrect');
+  });
+  const fb = document.getElementById('briefing-feedback');
+  fb.textContent = correct === items.length ? `✅ Perfeito! Você compreendeu o fluxo completo do esquema.` : `Você acertou ${correct} de ${items.length} etapas. Tente reorganizar os itens incorretos.`;
+  fb.classList.add('visible');
+  if (correct < items.length) fb.classList.add('error');
+}
+
+function renderBriefingGlossary(mission) {
+  const container = document.getElementById('briefing-glossary-items');
+  // Show relevant glossary terms
+  const relevantTerms = GLOSSARY.slice(0, 8);
+  container.innerHTML = relevantTerms.map(g => `
+    <div class="glossary-item">
+      <div class="glossary-term">
+        ${g.term}
+        <span class="glossary-acronym">${g.full}</span>
+      </div>
+      <div class="glossary-def">${g.def}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// GAME
+// ═══════════════════════════════════════════
+function startGame() {
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const mission = missions[state.missionIndex];
+
+  // Topbar
+  const modeBadge = document.getElementById('game-mode-badge');
+  modeBadge.textContent = state.mode === 'investigador' ? '🔍 Investigador' : '🏗️ Construtor';
+  modeBadge.className = 'game-mode-badge ' + (state.mode === 'investigador' ? 'badge-inv' : 'badge-con');
+
+  document.getElementById('game-mission-id').textContent = mission.id;
+  document.getElementById('game-mission-title').textContent = mission.title;
+  document.getElementById('game-score').textContent = 'Pontos: 0';
+
+  // Exposure meter
+  const expWrapper = document.getElementById('exposure-wrapper');
+  expWrapper.style.display = state.mode === 'construtor' ? 'block' : 'none';
+
+  // Timer
+  const timerEl = document.getElementById('game-timer');
+  if (state.difficulty === 'hard') {
+    state.timeLeft = 180;
+    timerEl.textContent = '03:00';
+    state.timerInterval = setInterval(updateTimer, 1000);
+  } else {
+    timerEl.textContent = '∞';
+  }
+
+  // Hints
+  const hintSection = document.getElementById('hint-section');
+  const hintBtn = document.getElementById('hint-btn');
+  if (state.difficulty === 'hard') {
+    hintSection.style.display = 'none';
+  } else {
+    hintSection.style.display = 'block';
+    hintBtn.disabled = false;
+    hintBtn.textContent = state.difficulty === 'medium' ? '💡 Ver dica (−50 pts)' : '💡 Ver dica (grátis)';
+    document.getElementById('hint-text').classList.remove('visible');
+    document.getElementById('hint-text').textContent = mission.hint;
+  }
+
+  // Progress
+  const total = state.mode === 'investigador' ? MISSIONS_INV.length : MISSIONS_CON.length;
+  const pct = Math.round(((state.missionIndex + 1) / total) * 100);
+  document.getElementById('prog-current').textContent = state.missionIndex + 1;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-completed').textContent = `${state.completedMissions.length} missões concluídas`;
+
+  renderGamePanels(mission);
+  renderDecisions(mission);
+  renderSidebarGlossary();
+
+  goTo('screen-game');
+}
+
+function updateTimer() {
+  state.timeLeft--;
+  const timerEl = document.getElementById('game-timer');
+  if (!timerEl) { clearInterval(state.timerInterval); return; } // BUG 4 fix: null check
+  const m = Math.floor(state.timeLeft / 60).toString().padStart(2,'0');
+  const s = (state.timeLeft % 60).toString().padStart(2,'0');
+  timerEl.textContent = `${m}:${s}`;
+  if (state.timeLeft <= 30) {
+    timerEl.classList.add('warning');
+    if (state.timeLeft % 5 === 0) soundTimer(); // BUG 3 fix: toca a cada 5s no último 30s
+  }
+  if (state.timeLeft <= 0) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+    autoDecision();
+  }
+}
+
+function renderGamePanels(mission) {
+  const panels = document.getElementById('game-panels');
+  if (state.mode === 'investigador') {
+    panels.innerHTML = `
+      <div class="game-panel">
+        <div class="game-panel-title">🚨 Alertas ativos</div>
+        ${mission.alerts.map((a, i) => `
+          <div class="alert-item" onclick="toggleAlert(this, ${i})">
+            <div class="alert-dot"></div>
+            <div class="alert-text">${a.text}</div>
+          </div>
+        `).join('')}
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted)">Clique nos alertas para selecionar os mais relevantes antes de decidir.</div>
+      </div>
+      <div class="game-panel">
+        <div class="game-panel-title">👤 Dados do cliente / operação</div>
+        <table class="data-table">
+          ${mission.clientData.map(([k, v]) => {
+            if (typeof v === 'object' && v !== null) {
+              return `<tr><td>${k}</td><td class="${v.flag ? 'flag-value' : 'ok-value'}">${v.flag ? '⚠️ ' : '✓ '}${v.value}</td></tr>`;
+            }
+            return `<tr><td>${k}</td><td>${v}</td></tr>`;
+          }).join('')}
+        </table>
+      </div>
+    `;
+  } else {
+    // Construtor mode
+    panels.innerHTML = `
+      <div class="game-panel">
+        <div class="game-panel-title">🏗️ Construa o esquema</div>
+        <div class="choice-group">
+          <div class="choice-group-title">Canal de entrada do dinheiro:</div>
+          <div class="choice-options">
+            ${[
+              { text: 'Pix via laranjas PF', risk: 'Médio — device fingerprint rastreável', level: 'medium' },
+              { text: 'Merchant de fachada PJ', risk: 'Alto — KYB detecta sem operação real', level: 'high' },
+              { text: 'Plataforma de apostas', risk: 'Médio — proporção depósito/saque detectável', level: 'medium' },
+              { text: 'Exchange de criptoativos', risk: 'Alto — on-ramp correlacionado com fraudes', level: 'high' },
+            ].map((opt, i) => `
+              <div class="choice-option" onclick="selectChoice(this, ${i}, ${10 + i*15})">
+                <div class="choice-radio"></div>
+                <div>
+                  <div class="choice-text">${opt.text}</div>
+                  <div class="choice-risk ${opt.level}">Risco de detecção: ${opt.risk}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="choice-group">
+          <div class="choice-group-title">Camada de ocultação:</div>
+          <div class="choice-options">
+            ${[
+              { text: 'Empresa de consultoria fictícia', risk: 'Alto — sem entregável é red flag', level: 'high' },
+              { text: 'Transferências circulares entre contas', risk: 'Alto — grafo detecta circularidade', level: 'high' },
+              { text: 'Stablecoin em exchange', risk: 'Médio — blockchain analytics rastreia', level: 'medium' },
+            ].map((opt, i) => `
+              <div class="choice-option" onclick="selectChoice(this, ${i+10}, ${15 + i*10})">
+                <div class="choice-radio"></div>
+                <div>
+                  <div class="choice-text">${opt.text}</div>
+                  <div class="choice-risk ${opt.level}">Risco: ${opt.risk}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="game-panel">
+        <div class="game-panel-title">📊 Medidor de exposição em tempo real</div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;color:var(--text-dim);line-height:1.6;margin-bottom:16px">
+            Cada decisão aumenta sua exposição ao sistema de PLD/FT. Um bom analista detecta o padrão antes mesmo de você finalizar o esquema.
+          </div>
+          <div id="exposure-detail" style="font-size:13px;color:var(--text-muted)">
+            Nenhuma escolha feita ainda. Seu risco de detecção é 0%.
+          </div>
+        </div>
+        <div style="margin-top:24px">
+          <div class="game-panel-title" style="margin-bottom:12px">💡 O que você está deixando como rastro:</div>
+          <div id="trail-list" style="font-size:13px;color:var(--text-dim);line-height:1.8">
+            Faça suas escolhas para ver os rastros que está deixando.
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function toggleAlert(el, idx) {
+  if (state.selectedAlerts.has(idx)) {
+    state.selectedAlerts.delete(idx);
+    el.classList.remove('selected');
+  } else {
+    state.selectedAlerts.add(idx);
+    el.classList.add('selected');
+  }
+}
+
+function selectChoice(el, choiceId, exposureIncrease) {
+  // Deselect siblings
+  el.closest('.choice-options').querySelectorAll('.choice-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Update exposure
+  state.exposure = Math.min(100, state.exposure + exposureIncrease);
+  updateExposureMeter();
+
+  // Update trail
+  const trails = {
+    0: '• Device fingerprint dos laranjas ficará registrado',
+    1: '• KYB identificará empresa sem operação real',
+    2: '• Sistema detecta proporção depósito/saque suspeita',
+    3: '• Correlação temporal: Pix → compra de cripto em minutos',
+    10: '• Auditoria vai pedir entregável — não haverá nenhum',
+    11: '• Grafo de transações revela circularidade em minutos',
+    12: '• Blockchain analytics rastreia mesmo através de exchanges',
+  };
+
+  const trailList = document.getElementById('trail-list');
+  if (trailList && trails[choiceId]) {
+    const existing = trailList.innerHTML.replace('Faça suas escolhas para ver os rastros que está deixando.', '');
+    if (!existing.includes(trails[choiceId])) {
+      trailList.innerHTML = existing + trails[choiceId] + '<br>';
+    }
+  }
+}
+
+function updateExposureMeter() {
+  const fill = document.getElementById('exposure-fill');
+  const pct = document.getElementById('exposure-pct');
+  const topFill = document.getElementById('exposure-fill');
+  const topPct = document.getElementById('exposure-pct');
+
+  if (fill) {
+    fill.style.width = state.exposure + '%';
+    const color = state.exposure < 30 ? 'var(--blue)' : state.exposure < 60 ? 'var(--amber)' : 'var(--red)';
+    fill.style.background = color;
+  }
+  if (pct) pct.textContent = state.exposure + '%';
+
+  const detail = document.getElementById('exposure-detail');
+  if (detail) {
+    if (state.exposure < 30) detail.textContent = `Risco baixo (${state.exposure}%). Ainda pouco detectável — mas o padrão está se formando.`;
+    else if (state.exposure < 60) detail.textContent = `⚠️ Risco médio (${state.exposure}%). Um analista de nível médio já veria o padrão.`;
+    else detail.textContent = `🚨 Risco alto (${state.exposure}%). Qualquer sistema de PLD/FT decente já teria disparado um alerta.`;
+  }
+}
+
+function renderDecisions(mission) {
+  const grid = document.getElementById('decisions-grid');
+  grid.innerHTML = mission.decisions.map((d, i) => `
+    <button class="decision-btn ${d.type}" onclick="makeDecision(${i})">
+      <span class="decision-icon">${d.icon}</span>
+      ${d.label}
+    </button>
+  `).join('');
+}
+
+function makeDecision(decisionIdx) {
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const mission = missions[state.missionIndex];
+  const decision = mission.decisions[decisionIdx];
+
+  state.missionDecision = decision;
+  state.score += decision.points || 0;
+  state.totalScore += Math.max(0, decision.points || 0);
+  clearInterval(state.timerInterval);
+
+  const isCorrect = !!decision.correct;
+
+  // Streak
+  if (isCorrect) {
+    state.streak++;
+    state.correctCount++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    if (state.streak >= 3) soundStreak(); else soundCorrect();
+    if (decision.label && decision.label.includes('COAF')) soundCoaf();
+  } else {
+    state.streak = 0;
+    state.wrongCount++;
+    soundWrong();
+  }
+
+  // Persistência
+  localStorage.setItem('yv_streak', state.streak);
+  localStorage.setItem('yv_best_streak', state.bestStreak);
+  localStorage.setItem('yv_total_score', state.totalScore);
+  localStorage.setItem('yv_correct', state.correctCount);
+  localStorage.setItem('yv_wrong', state.wrongCount);
+
+  if (state.mode === 'construtor' && decision.exposure) {
+    state.exposure = Math.min(100, state.exposure + decision.exposure);
+    updateExposureMeter();
+  }
+
+  if (!state.completedMissions.includes(mission.id)) {
+    state.completedMissions.push(mission.id);
+    localStorage.setItem('yv_completed', JSON.stringify(state.completedMissions));
+  }
+
+  // Transição suave antes do debrief
+  const gameEl = document.getElementById('screen-game');
+  gameEl.style.opacity = '0';
+  gameEl.style.transition = 'opacity 0.3s ease';
+  setTimeout(() => {
+    gameEl.style.opacity = '';
+    gameEl.style.transition = '';
+    showDebrief(mission, decision);
+  }, 320);
+}
+
+function autoDecision() {
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const mission = missions[state.missionIndex];
+  soundWrong();
+  showToast('⏱️ Tempo esgotado!', 'error');
+  // Registra como erro: quebra streak e persiste
+  state.streak = 0;
+  state.wrongCount++;
+  localStorage.setItem('yv_streak', '0');
+  localStorage.setItem('yv_wrong', state.wrongCount);
+  if (!state.completedMissions.includes(mission.id)) {
+    state.completedMissions.push(mission.id);
+    localStorage.setItem('yv_completed', JSON.stringify(state.completedMissions));
+  }
+  showDebrief(mission, { points: -50, correct: false });
+}
+
+function useHint() {
+  if (state.hintUsed) return;
+  state.hintUsed = true;
+  if (state.difficulty === 'medium') state.score -= 50;
+
+  const btn = document.getElementById('hint-btn');
+  btn.disabled = true;
+  btn.textContent = 'Dica utilizada';
+  document.getElementById('hint-text').classList.add('visible');
+}
+
+function renderSidebarGlossary() {
+  const container = document.getElementById('sidebar-glossary');
+  container.innerHTML = GLOSSARY.map(g => `
+    <div class="sidebar-glossary-item" onclick="this.querySelector('.sidebar-def').classList.toggle('expanded')">
+      <div class="sidebar-term">
+        ${g.term}
+        <span class="sidebar-term-full">${g.full}</span>
+      </div>
+      <div class="sidebar-def">${g.def}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// DEBRIEF
+// ═══════════════════════════════════════════
+function showDebrief(mission, decision) {
+  const d = mission.debrief;
+  const isCorrect = decision.correct || d.result === 'learning';
+  const resultIcon = isCorrect ? '🎯' : '📚';
+  const resultTitle = isCorrect
+    ? (state.mode === 'construtor' ? 'Esquema analisado' : 'Decisão correta!')
+    : 'Decisão incorreta — mas você aprendeu';
+
+  // Badge de operação real
+  const op = REAL_OPS[mission.id];
+  const opBadgeHTML = op ? `
+    <a class="op-badge" href="${op.url}" target="_blank" rel="noopener">
+      <span class="op-badge-dot"></span>
+      Baseado em: ${op.name}
+    </a>` : '';
+
+  // Streak display
+  let streakHTML = '';
+  if (state.streak >= 2 && isCorrect) {
+    streakHTML = `
+      <div class="streak-bar">
+        <div class="streak-badge">🔥 ${state.streak}</div>
+        <div class="streak-label">${state.streak >= 5 ? 'Sequência impressionante!' : state.streak >= 3 ? 'Boa sequência!' : 'Sequência de acertos'}</div>
+      </div>`;
+  }
+
+  const debrief = document.getElementById('debrief-content');
+  debrief.innerHTML = `
+    <div style="max-width:860px;margin:0 auto;padding:40px 24px 80px">
+
+      <!-- Resultado -->
+      <div class="debrief-result" style="border-color:${isCorrect ? 'rgba(6,214,160,0.3)' : 'rgba(230,57,70,0.3)'}">
+        <div class="debrief-result-icon">${resultIcon}</div>
+        <div class="debrief-result-info" style="flex:1">
+          <h2 style="color:${isCorrect ? 'var(--green)' : 'var(--red)'}">${resultTitle}</h2>
+          <p>${mission.title} — ${mission.type}</p>
+          ${opBadgeHTML}
+          <div class="debrief-score-pills" style="margin-top:12px">
+            <div class="score-pill neutral">${mission.id}</div>
+            <div class="score-pill ${mission.diff === 'easy' ? 'good' : mission.diff === 'hard' ? 'bad' : 'neutral'}">
+              ${mission.diff === 'easy' ? '🟢 Fácil' : mission.diff === 'medium' ? '🟡 Médio' : '🔴 Difícil'}
+            </div>
+            <div class="score-pill ${state.score >= 0 ? 'good' : 'bad'}">
+              ${state.score > 0 ? '+' : ''}${state.score} pts
+            </div>
+            ${state.mode === 'construtor' ? `<div class="score-pill bad">Exposição: ${state.exposure}%</div>` : ''}
+          </div>
+          ${streakHTML}
+        </div>
+      </div>
+
+      <!-- Decisão correta -->
+      <div class="debrief-section">
+        <div class="debrief-section-title">A decisão correta</div>
+        <div class="debrief-decision ${isCorrect ? 'correct' : 'wrong'}">
+          <div class="debrief-decision-label">${isCorrect ? '✅ Você acertou' : '❌ O que deveria ter sido feito'}</div>
+          <div class="debrief-decision-text">${d.correctDecision}</div>
+        </div>
+        <div style="margin-top:16px;font-size:14px;color:var(--text-dim);line-height:1.7">${d.explanation}</div>
+      </div>
+
+      <!-- Mapa do esquema — animado -->
+      <div class="debrief-section">
+        <div class="debrief-section-title">🗺️ Mapa do esquema</div>
+        <div class="flow-map" id="flow-map-container">
+          ${d.flow.map((row, ri) => {
+            if (Array.isArray(row)) {
+              return `<div class="flow-row">${row.map(node => {
+                const isArrow = /^[→↓↗↙←↑]/.test(node.label);
+                if (isArrow) return `<div class="flow-arrow" style="animation-delay:${0.05 + ri*0.15}s">${node.label}</div>`;
+                return `<div class="flow-node ${node.type||''}" style="animation-delay:${0.05+ri*0.15}s">${node.label}</div>`;
+              }).join('')}</div>`;
+            } else if (row && row.label) {
+              return `<div class="flow-row"><div class="flow-node ${row.type||''}" style="animation-delay:${0.05+ri*0.15}s">${row.label}</div></div>`;
+            }
+            return '';
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Red flags -->
+      <div class="debrief-section">
+        <div class="debrief-section-title">🚨 Red flags desta missão</div>
+        <div class="flags-grid">
+          ${d.flags.map((f,fi) => `
+            <div class="flag-item ${f.found ? 'found' : 'missed'}"
+                 style="opacity:0;animation:nodeIn 0.35s ease ${0.1+fi*0.08}s forwards">
+              <div class="flag-status">${f.found ? '🚨' : '○'}</div>
+              <div>
+                <div class="flag-label">${f.found ? 'Red flag identificado' : 'Red flag a observar'}</div>
+                <div class="flag-text">${f.text}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Referências legais -->
+      <div class="debrief-section">
+        <div class="debrief-section-title">📚 Base legal e referências</div>
+        <div class="refs-grid">
+          ${d.refs.map(ref => `
+            <div class="ref-item">
+              <div class="ref-header">
+                <div class="ref-icon">${ref.icon}</div>
+                <div>
+                  <div class="ref-name">${ref.name}</div>
+                  <div class="ref-full">${ref.full}</div>
+                </div>
+              </div>
+              <div class="ref-plain">💬 Em linguagem simples: ${ref.plain}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="debrief-btns">
+        <button class="btn-primary" onclick="nextMission()">Próxima missão →</button>
+        <button class="btn-ghost" onclick="startMission(${state.missionIndex})">Refazer</button>
+        <button class="btn-ghost" onclick="goTo('screen-missions')">Ver missões</button>
+        <button class="btn-ghost" onclick="goTo('screen-home')">Início</button>
+      </div>
+    </div>
+  `;
+
+  goTo('screen-debrief');
+}
+
+function nextMission() {
+  soundClick();
+  const missions = state.mode === 'investigador' ? MISSIONS_INV : MISSIONS_CON;
+  const nextIdx = state.missionIndex + 1;
+  if (nextIdx < missions.length) {
+    // Transição suave
+    const debEl = document.getElementById('screen-debrief');
+    debEl.style.opacity = '0';
+    debEl.style.transition = 'opacity 0.25s ease';
+    setTimeout(() => {
+      debEl.style.opacity = '';
+      debEl.style.transition = '';
+      startMission(nextIdx);
+    }, 270);
+  } else {
+    showToast('🏆 Você completou todas as missões!', 'success');
+    soundStreak();
+    goTo('screen-missions');
+  }
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast ${type} visible`;
+  setTimeout(() => toast.classList.remove('visible'), 3500);
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function showModal(title, text, btns = []) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').innerHTML = text;
+  const btnsEl = document.getElementById('modal-btns');
+  btnsEl.innerHTML = btns.map(b => `<button class="${b.primary ? 'btn-primary' : 'btn-ghost'}" onclick="${b.action}">${b.label}</button>`).join('');
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('visible');
+});
+
+// ═══════════════════════════════════════════
+// ESTATÍSTICAS
+// ═══════════════════════════════════════════
+const ACHIEVEMENTS = [
+  { id: 'first',     icon: '🎯', title: 'Primeira Decisão', desc: 'Complete qualquer missão.',        check: () => state.completedMissions.length >= 1 },
+  { id: 'streak3',   icon: '🔥', title: 'Em Chamas',        desc: '3 acertos seguidos.',              check: () => state.bestStreak >= 3 },
+  { id: 'streak5',   icon: '⚡', title: 'Implacável',       desc: '5 acertos seguidos.',              check: () => state.bestStreak >= 5 },
+  { id: 'streak10',  icon: '💎', title: 'Analista Elite',   desc: '10 acertos seguidos.',             check: () => state.bestStreak >= 10 },
+  { id: 'complete15',icon: '🏅', title: 'Iniciado',         desc: '15 missões concluídas.',           check: () => state.completedMissions.length >= 15 },
+  { id: 'complete50',icon: '🏆', title: 'Investigador',     desc: '50 missões concluídas.',           check: () => state.completedMissions.length >= 50 },
+  { id: 'complete100',icon:'👑', title: 'Mestre PLD',       desc: 'Todas as 100 missões.',            check: () => state.completedMissions.length >= 100 },
+  { id: 'hard1',     icon: '🔴', title: 'Sem Medo',         desc: 'Complete 1 missão difícil.',       check: () => state.completedMissions.some(id => { const m = [...MISSIONS_INV,...MISSIONS_CON].find(x=>x.id===id); return m && m.diff==='hard'; }) },
+  { id: 'score1000', icon: '💰', title: 'Rentável',         desc: 'Acumule 1.000 pontos no total.',   check: () => state.totalScore >= 1000 },
+  { id: 'score5000', icon: '💵', title: 'Lucrativo',        desc: 'Acumule 5.000 pontos no total.',   check: () => state.totalScore >= 5000 },
+];
+
+function showStats() {
+  soundClick();
+
+  const total = MISSIONS_INV.length + MISSIONS_CON.length;
+  const invDone  = state.completedMissions.filter(id => id.startsWith('I-')).length;
+  const conDone  = state.completedMissions.filter(id => id.startsWith('C-')).length;
+  const accuracy = state.correctCount + state.wrongCount > 0
+    ? Math.round((state.correctCount / (state.correctCount + state.wrongCount)) * 100)
+    : 0;
+
+  // Stats no topo
+  document.getElementById('stats-top').innerHTML = [
+    { icon:'🔥', label:'Melhor sequência', val: state.bestStreak },
+    { icon:'🎯', label:'Taxa de acerto',   val: accuracy + '%' },
+    { icon:'💰', label:'Pontuação total',  val: state.totalScore.toLocaleString('pt-BR') },
+    { icon:'✅', label:'Missões feitas',   val: state.completedMissions.length + '/' + total },
+  ].map(s => `
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;margin-bottom:8px">${s.icon}</div>
+      <div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--blue)">${s.val}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-family:var(--mono)">${s.label}</div>
+    </div>`).join('');
+
+  // Progresso por modo
+  document.getElementById('stats-progress').innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px">
+        <span style="color:var(--blue)">🔍 Investigador</span>
+        <span style="color:var(--text-muted);font-family:var(--mono)">${invDone} / 50</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${(invDone/50)*100}%;background:var(--blue);border-radius:4px;transition:width 0.6s ease"></div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px">
+        <span style="color:var(--red)">🏗️ Construtor</span>
+        <span style="color:var(--text-muted);font-family:var(--mono)">${conDone} / 50</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${(conDone/50)*100}%;background:var(--red);border-radius:4px;transition:width 0.6s ease"></div>
+      </div>
+    </div>`;
+
+  // Conquistas
+  document.getElementById('stats-achievements').innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = a.check();
+    return `
+      <div style="background:var(--panel2);border:1px solid ${unlocked ? 'rgba(255,183,3,0.4)' : 'var(--border)'};border-radius:10px;padding:16px;display:flex;gap:12px;align-items:flex-start;opacity:${unlocked?1:0.4}">
+        <span style="font-size:24px;flex-shrink:0">${a.icon}</span>
+        <div>
+          <div style="font-family:var(--display);font-size:14px;font-weight:600;margin-bottom:2px;color:${unlocked?'var(--amber)':'var(--text-dim)'}">${a.title}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${a.desc}</div>
+          ${unlocked ? '<div style="font-size:11px;color:var(--amber);margin-top:4px;font-family:var(--mono)">✓ Desbloqueado</div>' : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  goTo('screen-stats');
+}
+
+function resetStats() {
+  if (!confirm('Resetar todo o progresso? Essa ação não pode ser desfeita.')) return;
+  ['yv_completed','yv_streak','yv_best_streak','yv_total_score','yv_correct','yv_wrong'].forEach(k => localStorage.removeItem(k));
+  location.reload();
+}
+
+function updateStreakDisplay() {
+  const el = document.getElementById('streak-display');
+  if (!el) return;
+  if (state.streak >= 2) {
+    el.style.display = 'block';
+    el.textContent = `🔥 ${state.streak}`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════
+// CANVAS ANIMATION — chuva de notas de real
+// Estilo: notas grandes, densas, girando em 3D
+// ═══════════════════════════════════════════
+(function initCanvas() {
+  const canvas = document.getElementById('nodes-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, bills = [];
+
+  // Todas as denominações com cores fiéis às notas reais
+  const DENOMS = [
+    { label: 'R$2',   bg: '#1a4a2a', hi: '#2d7a48', mid: '#1d5c35', text: '#a8e6c0', dark: '#0d2a18' },
+    { label: 'R$5',   bg: '#4a1e08', hi: '#8a3a14', mid: '#6b2e10', text: '#f0b080', dark: '#2a0e04' },
+    { label: 'R$10',  bg: '#0d2e52', hi: '#1a5a9a', mid: '#154878', text: '#80c0f0', dark: '#071828' },
+    { label: 'R$20',  bg: '#3a1040', hi: '#742080', mid: '#581860', text: '#d080e8', dark: '#200828' },
+    { label: 'R$50',  bg: '#2e1a00', hi: '#7a4800', mid: '#5a3400', text: '#e8b840', dark: '#180e00' },
+    { label: 'R$100', bg: '#0a2818', hi: '#186840', mid: '#124e30', text: '#60d098', dark: '#051410' },
+    { label: 'R$200', bg: '#280808', hi: '#681818', mid: '#4e1010', text: '#e86060', dark: '#140404' },
+  ];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function makeBill() {
+    const d  = DENOMS[Math.floor(Math.random() * DENOMS.length)];
+    // Notas maiores — entre 110 e 180px de largura
+    const bw = 110 + Math.random() * 70;
+    const bh = bw * 0.44;
+    return {
+      x:     Math.random() * (W + 200) - 100,
+      y:     -bh - Math.random() * H,        // começa acima da tela
+      bw, bh,
+      // rotação Z (inclinação no plano)
+      rz:    (Math.random() - 0.5) * 0.9,
+      drz:   (Math.random() - 0.5) * 0.022,
+      // flip 3D simulado: ângulo de perspectiva em Y
+      ry:    Math.random() * Math.PI * 2,
+      dry:   0.028 + Math.random() * 0.04,   // velocidade de flip
+      // queda
+      vy:    1.2 + Math.random() * 1.8,
+      // balanço lateral (como papel ao vento)
+      swing: Math.random() * Math.PI * 2,
+      swingSpeed: 0.018 + Math.random() * 0.018,
+      swingAmp:   1.2 + Math.random() * 2.0,
+      // opacidade — notas visíveis, como na imagem
+      opacity: 0.55 + Math.random() * 0.40,
+      denom: d,
+    };
+  }
+
+  function init() {
+    resize();
+    // Começa com 55 notas já espalhadas pela tela
+    bills = Array.from({ length: 55 }, () => {
+      const b = makeBill();
+      b.y = Math.random() * H; // distribuídas na tela toda
+      return b;
+    });
+  }
+
+  // Desenha uma nota com flip 3D simulado via scaleX
+  function drawBill(b) {
+    const { bw, bh, rz, ry, denom, opacity } = b;
+
+    // scaleX simula o giro em Y: cos(ry) vai de -1 a +1
+    const scaleX = Math.cos(ry);
+    const absScale = Math.abs(scaleX);
+
+    // Quando a nota está "de lado" (absScale próximo de 0), fica invisível
+    if (absScale < 0.04) return;
+
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(rz);
+    ctx.scale(scaleX, 1); // flip 3D no eixo Y
+    ctx.globalAlpha = opacity * (0.4 + absScale * 0.6);
+
+    // Sombra para dar profundidade
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowBlur  = 18;
+    ctx.shadowOffsetX = scaleX * 4;
+    ctx.shadowOffsetY = 6;
+
+    const r = 5; // border-radius
+
+    // ── Corpo principal ──
+    ctx.beginPath();
+    ctx.roundRect(-bw/2, -bh/2, bw, bh, r);
+    ctx.fillStyle = denom.bg;
+    ctx.fill();
+
+    // Gradiente de iluminação (simula curvatura da nota)
+    const grad = ctx.createLinearGradient(-bw/2, -bh/2, bw/2, bh/2);
+    grad.addColorStop(0,   denom.hi  + '55');
+    grad.addColorStop(0.4, denom.hi  + '00');
+    grad.addColorStop(0.6, denom.dark + '00');
+    grad.addColorStop(1,   denom.dark + '88');
+    ctx.beginPath();
+    ctx.roundRect(-bw/2, -bh/2, bw, bh, r);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // ── Faixa lateral esquerda ──
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.roundRect(-bw/2, -bh/2, bw * 0.20, bh, [r, 0, 0, r]);
+    ctx.fillStyle = denom.mid;
+    ctx.fill();
+
+    // ── Borda fina ──
+    ctx.beginPath();
+    ctx.roundRect(-bw/2, -bh/2, bw, bh, r);
+    ctx.strokeStyle = denom.text + '50';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // ── Denominação central ──
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = denom.text + '80';
+    ctx.fillStyle = denom.text;
+    ctx.font = `bold ${bh * 0.40}px "Space Grotesk", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(denom.label, bw * 0.12, 0);
+
+    // ── Texto secundário ──
+    ctx.shadowBlur = 0;
+    ctx.font = `${bh * 0.11}px "Inter", sans-serif`;
+    ctx.fillStyle = denom.text + '90';
+    ctx.fillText('BANCO CENTRAL DO BRASIL', bw * 0.08, -bh * 0.28);
+
+    // ── Padrão guilhoché (linhas de segurança onduladas) ──
+    ctx.beginPath();
+    const step = bw * 0.09;
+    for (let xi = -bw/2 + bw * 0.24; xi < bw/2 - 4; xi += step) {
+      ctx.moveTo(xi, -bh/2 + 3);
+      ctx.lineTo(xi, bh/2 - 3);
+    }
+    ctx.strokeStyle = denom.text + '20';
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // ── Marca d'água simulada ──
+    ctx.font = `bold ${bh * 0.55}px "Space Grotesk", sans-serif`;
+    ctx.fillStyle = denom.text + '08';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('R$', bw * 0.18, 0);
+
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    bills.forEach((b, i) => {
+      // Atualiza física
+      b.ry    += b.dry;                                         // giro 3D
+      b.rz    += b.drz;                                         // inclinação Z
+      b.swing += b.swingSpeed;
+      b.x     += Math.sin(b.swing) * b.swingAmp;               // balanço lateral
+      b.y     += b.vy;                                          // queda
+
+      drawBill(b);
+
+      // Recicla nota que saiu da tela
+      if (b.y > H + b.bh + 40) {
+        bills[i] = makeBill();
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  draw();
+})();
+
+// ═══════════════════════════════════════════
+// SCORE E STREAK — atualiza em tempo real
+// ═══════════════════════════════════════════
+function updateScoreDisplay() {
+  const el = document.getElementById('game-score');
+  if (el) el.textContent = `Pontos: ${state.score}`;
+  updateStreakDisplay();
+}
+
+// Inicializa ícone de som e listeners estáticos
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('sound-btn');
+  if (btn) btn.textContent = soundEnabled ? '🔊' : '🔇';
+
+  // Som nos botões estáticos de navegação (os dinâmicos usam onclick direto)
+  document.querySelectorAll('.back-btn').forEach(b => {
+    b.addEventListener('click', soundClick);
+  });
+});
+
+// ═══════════════════════════════════════════
+// REFERÊNCIAS GLOBAIS — rodapé informativo
+// ═══════════════════════════════════════════
+// Todas as operações reais citadas neste jogo têm fonte oficial (gov.br).
+// Todas as tipologias internacionais têm fonte em relatórios FATF, Europol, FinCEN,
+// FFIEC ou decisões judiciais públicas dos EUA.
+// As normas brasileiras citadas são: Lei nº 9.613/1998, Lei nº 12.683/2012,
+// Circular BCB nº 3.978/2020, Carta Circular BCB nº 4.001/2020,
+// Resolução BCB nº 1/2020, Resolução BCB nº 80/2021,
+// Lei nº 14.478/2022, Decreto nº 11.563/2023, Resolução BCB nº 520/2025.
+</script>
+</body>
+</html>
